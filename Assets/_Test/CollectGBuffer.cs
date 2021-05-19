@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.Universal.Internal;
 
 [CreateAssetMenu]
 public class CollectGBuffer : ScriptableRendererFeature
@@ -10,6 +11,8 @@ public class CollectGBuffer : ScriptableRendererFeature
     public string[] nameList;
     public Material[] materialList;
     public GraphicsFormat[] overrideFormat;
+    public bool copyDepth;
+    public Material copyDepthMat;
     
 	public CollectGBuffer()
 	{
@@ -21,9 +24,16 @@ public class CollectGBuffer : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+        var evt = RenderPassEvent.AfterRenderingGbuffer;
         //var cameraColorTarget = renderer.cameraColorTarget;
-        var pass = new CollectGBufferPass(materialList,nameList,overrideFormat);
+        var pass = new CollectGBufferPass(evt,materialList,nameList,overrideFormat);
         renderer.EnqueuePass(pass);
+
+        if(copyDepth)
+        {
+            var depthPass = new CopyDepthPass(evt,copyDepthMat);
+            renderer.EnqueuePass(depthPass);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -36,11 +46,11 @@ public class CollectGBuffer : ScriptableRendererFeature
         private int[] m_RTnameList;
         private GraphicsFormat[] overrideFormat;
 
-        public CollectGBufferPass(Material[] matL, string[] nameL, GraphicsFormat[] formats)
+        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, GraphicsFormat[] formats)
         {
             this.materialList = matL;
             this.nameList = nameL;
-            this.renderPassEvent = RenderPassEvent.AfterRenderingGbuffer;
+            this.renderPassEvent = evt;
             this.overrideFormat = formats;
 
             this.m_RTnameList = new int[nameList.Length];

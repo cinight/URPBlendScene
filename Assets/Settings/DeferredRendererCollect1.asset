@@ -26,6 +26,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: b52d9faf2c1a7f444ab8d1ba4d8e9224, type: 2}
   - {fileID: 2100000, guid: be7884ecaa66e394abc5a23938ed9015, type: 2}
   overrideFormat: 0000000000000000000000000000000000000000
+  copyDepth: 0
+  copyDepthMat: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

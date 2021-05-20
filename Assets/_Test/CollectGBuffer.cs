@@ -88,14 +88,18 @@ public class CollectGBuffer : ScriptableRendererFeature
 
             for(int i=0; i<materialList.Length; i++)
             {
+                cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+
                 if(overrideFormat[i] == GraphicsFormat.DepthAuto)
                 {
-                    cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
                     cmd.SetGlobalTexture("_CameraDepthTexture",m_RTList[i]);
+                }
+                else if(overrideFormat[i] == GraphicsFormat.ShadowAuto)
+                {
+                    cmd.SetGlobalTexture("_MainLightShadowmapTexture",m_RTList[i]);
                 }
                 else
                 {
-                    cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
                     cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
                 }
             }

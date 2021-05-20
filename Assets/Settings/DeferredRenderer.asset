@@ -19,15 +19,15 @@ MonoBehaviour:
   - _GBuffer2
   - _GBuffer3
   - _BlendDepthTexture
+  - _BlendShadowTexture
   materialList:
   - {fileID: 2100000, guid: 80cfe08e5ffc056478f35774a06d7c01, type: 2}
   - {fileID: 2100000, guid: 1349bc52fd5107e44b4b37b7b719fbc5, type: 2}
   - {fileID: 2100000, guid: 4d965931aafd9dd479aefee86490fa55, type: 2}
   - {fileID: 2100000, guid: 25046337aab49994aad704410bb24388, type: 2}
   - {fileID: 2100000, guid: 90097ff4f5072464abcd05b7185728b0, type: 2}
-  overrideFormat: 000000000000000000000000000000008e000000
-  copyDepth: 0
-  copyDepthMat: {fileID: 2100000, guid: 94835132f1e6eff42b200af4410880f1, type: 2}
+  - {fileID: 2100000, guid: 9e06ef8a4e695344aacc6c9ef8dc6929, type: 2}
+  overrideFormat: 000000000000000000000000000000008e0000008f000000
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,8 +11,6 @@ public class CollectGBuffer : ScriptableRendererFeature
     public string[] nameList;
     public Material[] materialList;
     public GraphicsFormat[] overrideFormat;
-    public bool copyDepth;
-    public Material copyDepthMat;
     
 	public CollectGBuffer()
 	{
@@ -25,15 +23,16 @@ public class CollectGBuffer : ScriptableRendererFeature
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         var evt = RenderPassEvent.AfterRenderingGbuffer;
-        //var cameraColorTarget = renderer.cameraColorTarget;
+        //var cameraDepthTarget = renderer.cameraDepthTarget;
+        
         var pass = new CollectGBufferPass(evt,materialList,nameList,overrideFormat);
         renderer.EnqueuePass(pass);
 
-        if(copyDepth)
-        {
-            var depthPass = new CopyDepthPass(evt,copyDepthMat);
-            renderer.EnqueuePass(depthPass);
-        }
+        // if(copyDepth)
+        // {
+        //     var depthPass = new CopyDepthPass(evt,copyDepthMat);
+        //     renderer.EnqueuePass(depthPass);
+        // }
     }
 
     //-------------------------------------------------------------------------
@@ -89,8 +88,16 @@ public class CollectGBuffer : ScriptableRendererFeature
 
             for(int i=0; i<materialList.Length; i++)
             {
-                cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
-                cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                if(overrideFormat[i] == GraphicsFormat.DepthAuto)
+                {
+                    cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                    cmd.SetGlobalTexture("_CameraDepthTexture",m_RTList[i]);
+                }
+                else
+                {
+                    cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                    cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                }
             }
 
             context.ExecuteCommandBuffer(cmd);

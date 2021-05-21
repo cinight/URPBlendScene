@@ -16,6 +16,7 @@ Shader "Custom/BlendRT_GBuffer2"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+            #include "Blending.hlsl"
 
             struct appdata
             {
@@ -48,7 +49,7 @@ Shader "Custom/BlendRT_GBuffer2"
                 float4 col1 = tex2D(Cam1_GBuffer2, i.uv);
                 float4 col2 = tex2D(Cam2_GBuffer2, i.uv);
 
-                float4 col = lerp(col1,col2,_Blend);
+                float4 col = Blending(col1,col2,_Blend);
                 return col;
             }
             ENDCG

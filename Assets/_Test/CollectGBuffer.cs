@@ -14,7 +14,10 @@ public class CollectGBuffer : ScriptableRendererFeature
 
     public enum RTtype
     {
-        Color,
+        GBuffer0,
+        GBuffer1,
+        GBuffer2,
+        GBuffer3,
         Depth,
         MainShadow,
         AddShadow
@@ -76,6 +79,10 @@ public class CollectGBuffer : ScriptableRendererFeature
                 RenderTextureDescriptor descriptor = cameraTextureDescripor;
                 switch(rtType[i])
                 {
+                    case RTtype.GBuffer0: descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_SRGB; break;
+                    case RTtype.GBuffer1: descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm; break;
+                    case RTtype.GBuffer2: descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_SNorm; break;
+                    case RTtype.GBuffer3: descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm; break;
                     case RTtype.Depth: descriptor.graphicsFormat = GraphicsFormat.DepthAuto; break;
                     case RTtype.MainShadow: descriptor.graphicsFormat = GraphicsFormat.ShadowAuto; break;
                     case RTtype.AddShadow: descriptor.graphicsFormat = GraphicsFormat.ShadowAuto; break;

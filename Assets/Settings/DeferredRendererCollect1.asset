@@ -20,6 +20,7 @@ MonoBehaviour:
   - Cam1_GBuffer3
   - Cam1_CameraDepthTexture
   - Cam1_ShadowTexture
+  - Cam1_ShadowAddTexture
   materialList:
   - {fileID: 2100000, guid: f0e8c8e4d2766f1489889b50fa70b428, type: 2}
   - {fileID: 2100000, guid: f7ade5b554884e349baab25d30a9687c, type: 2}
@@ -27,7 +28,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: b52d9faf2c1a7f444ab8d1ba4d8e9224, type: 2}
   - {fileID: 2100000, guid: be7884ecaa66e394abc5a23938ed9015, type: 2}
   - {fileID: 2100000, guid: 8bd89489efcd03745ba1dcffe166aed2, type: 2}
-  overrideFormat: 000000000000000000000000000000000000000000000000
+  - {fileID: 2100000, guid: b2c8ebd908d2e954ba973d4c3ead72c8, type: 2}
+  rtType: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

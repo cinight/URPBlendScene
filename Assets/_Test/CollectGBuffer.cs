@@ -10,7 +10,15 @@ public class CollectGBuffer : ScriptableRendererFeature
 {
     public string[] nameList;
     public Material[] materialList;
-    public GraphicsFormat[] overrideFormat;
+    public RTtype[] rtType;
+
+    public enum RTtype
+    {
+        Color,
+        Depth,
+        MainShadow,
+        AddShadow
+    }
     
 	public CollectGBuffer()
 	{
@@ -25,7 +33,7 @@ public class CollectGBuffer : ScriptableRendererFeature
         var evt = RenderPassEvent.AfterRenderingGbuffer;
         //var cameraDepthTarget = renderer.cameraDepthTarget;
         
-        var pass = new CollectGBufferPass(evt,materialList,nameList,overrideFormat);
+        var pass = new CollectGBufferPass(evt,materialList,nameList,rtType);
         renderer.EnqueuePass(pass);
 
         // if(copyDepth)
@@ -43,14 +51,14 @@ public class CollectGBuffer : ScriptableRendererFeature
         private Material[] materialList;
         private RenderTargetIdentifier[] m_RTList;
         private int[] m_RTnameList;
-        private GraphicsFormat[] overrideFormat;
+        private RTtype[] rtType;
 
-        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, GraphicsFormat[] formats)
+        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, RTtype[] rttype)
         {
             this.materialList = matL;
             this.nameList = nameL;
             this.renderPassEvent = evt;
-            this.overrideFormat = formats;
+            this.rtType = rttype;
 
             this.m_RTnameList = new int[nameList.Length];
             this.m_RTList = new RenderTargetIdentifier[nameList.Length];
@@ -66,7 +74,12 @@ public class CollectGBuffer : ScriptableRendererFeature
             for(int i=0; i<m_RTnameList.Length; i++)
             {
                 RenderTextureDescriptor descriptor = cameraTextureDescripor;
-                if(overrideFormat[i] != GraphicsFormat.None) descriptor.graphicsFormat = overrideFormat[i];
+                switch(rtType[i])
+                {
+                    case RTtype.Depth: descriptor.graphicsFormat = GraphicsFormat.DepthAuto; break;
+                    case RTtype.MainShadow: descriptor.graphicsFormat = GraphicsFormat.ShadowAuto; break;
+                    case RTtype.AddShadow: descriptor.graphicsFormat = GraphicsFormat.ShadowAuto; break;
+                }
                 cmd.GetTemporaryRT(m_RTnameList[i], descriptor);
             }
             RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
@@ -90,13 +103,18 @@ public class CollectGBuffer : ScriptableRendererFeature
             {
                 cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
 
-                if(overrideFormat[i] == GraphicsFormat.DepthAuto)
+                if(rtType[i] == RTtype.Depth)
                 {
-                    cmd.SetGlobalTexture("_CameraDepthTexture",m_RTList[i]);
+                    cmd.SetGlobalTexture("_CameraDepthTexture", m_RTList[i]);
+                    cmd.Blit( m_RTList[i] , renderingData.cameraData.renderer.cameraDepthTarget , materialList[i] );
                 }
-                else if(overrideFormat[i] == GraphicsFormat.ShadowAuto)
+                else if(rtType[i] == RTtype.MainShadow)
                 {
                     cmd.SetGlobalTexture("_MainLightShadowmapTexture",m_RTList[i]);
+                }
+                else if(rtType[i] == RTtype.AddShadow)
+                {
+                    cmd.SetGlobalTexture("_AdditionalLightsShadowmapTexture",m_RTList[i]);
                 }
                 else
                 {

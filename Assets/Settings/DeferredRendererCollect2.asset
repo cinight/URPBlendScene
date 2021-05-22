@@ -30,6 +30,15 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 8bd89489efcd03745ba1dcffe166aed2, type: 2}
   - {fileID: 2100000, guid: b2c8ebd908d2e954ba973d4c3ead72c8, type: 2}
   rtType: 00000000010000000200000003000000000000000000000000000000
+  rtSize:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 2048, y: 1024}
+  - {x: 2048, y: 1024}
+  mainCam: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

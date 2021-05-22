@@ -11,6 +11,7 @@ public class CollectGBuffer : ScriptableRendererFeature
     public string[] nameList;
     public Material[] materialList;
     public RTtype[] rtType;
+    public Vector2Int[] rtSize;
     public bool mainCam;
 
     public enum RTtype
@@ -37,7 +38,7 @@ public class CollectGBuffer : ScriptableRendererFeature
         var evt = RenderPassEvent.AfterRenderingGbuffer;
         //var cameraDepthTarget = renderer.cameraDepthTarget;
         
-        var pass = new CollectGBufferPass(evt,materialList,nameList,rtType,mainCam);
+        var pass = new CollectGBufferPass(evt,materialList,nameList,rtType,rtSize,mainCam);
         renderer.EnqueuePass(pass);
 
         // if(copyDepth)
@@ -57,9 +58,11 @@ public class CollectGBuffer : ScriptableRendererFeature
         private int[] m_RTnameList;
         private RTtype[] rtType;
         private bool mainCam;
+        private Vector2Int[] rtSize;
 
-        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, RTtype[] rttype, bool mainCam)
+        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, RTtype[] rttype, Vector2Int[] rtSize, bool mainCam)
         {
+            this.rtSize = rtSize;
             this.mainCam = mainCam;
             this.materialList = matL;
             this.nameList = nameL;
@@ -90,6 +93,13 @@ public class CollectGBuffer : ScriptableRendererFeature
                     case RTtype.MainShadow: descriptor.graphicsFormat = GraphicsFormat.ShadowAuto; break;
                     case RTtype.AddShadow: descriptor.graphicsFormat = GraphicsFormat.ShadowAuto; break;
                 }
+
+                if(rtSize[i].x > 0 && rtSize[i].y > 0)
+                {
+                    descriptor.width = rtSize[i].x;
+                    descriptor.height = rtSize[i].y;
+                }
+
                 cmd.GetTemporaryRT(m_RTnameList[i], descriptor);
             }
             RenderPipelineManager.endFrameRendering += OnEndFrameRendering;

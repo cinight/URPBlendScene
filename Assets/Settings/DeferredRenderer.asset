@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f27066a859911247b8d92ef8f8b2b16, type: 3}
   m_Name: NewBlitToRT
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   evt: 220
   RTname: _CameraDepthTexture
   material: {fileID: 0}
@@ -82,13 +82,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f27066a859911247b8d92ef8f8b2b16, type: 3}
   m_Name: NewBlitToRT
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   evt: 220
   RTname: 
   material: {fileID: 0}
   isDepth: 0
   clearFlag: 2147483647
-  clearColor: {r: 1, g: 0, b: 0, a: 0}
+  clearColor: {r: 0, g: 0, b: 0, a: 1}
   clearDepth: 0
   clearStencil: 0
 --- !u!114 &5668791282468791482

@@ -11,6 +11,7 @@ public class CollectGBuffer : ScriptableRendererFeature
     public string[] nameList;
     public Material[] materialList;
     public RTtype[] rtType;
+    public bool mainCam;
 
     public enum RTtype
     {
@@ -36,7 +37,7 @@ public class CollectGBuffer : ScriptableRendererFeature
         var evt = RenderPassEvent.AfterRenderingGbuffer;
         //var cameraDepthTarget = renderer.cameraDepthTarget;
         
-        var pass = new CollectGBufferPass(evt,materialList,nameList,rtType);
+        var pass = new CollectGBufferPass(evt,materialList,nameList,rtType,mainCam);
         renderer.EnqueuePass(pass);
 
         // if(copyDepth)
@@ -55,9 +56,11 @@ public class CollectGBuffer : ScriptableRendererFeature
         private RenderTargetIdentifier[] m_RTList;
         private int[] m_RTnameList;
         private RTtype[] rtType;
+        private bool mainCam;
 
-        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, RTtype[] rttype)
+        public CollectGBufferPass(RenderPassEvent evt, Material[] matL, string[] nameL, RTtype[] rttype, bool mainCam)
         {
+            this.mainCam = mainCam;
             this.materialList = matL;
             this.nameList = nameL;
             this.renderPassEvent = evt;
@@ -110,16 +113,16 @@ public class CollectGBuffer : ScriptableRendererFeature
             {
                 cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
 
-                if(rtType[i] == RTtype.Depth)
+                if(mainCam && rtType[i] == RTtype.Depth)
                 {
                     cmd.SetGlobalTexture("_CameraDepthTexture", m_RTList[i]);
                     cmd.Blit( m_RTList[i] , renderingData.cameraData.renderer.cameraDepthTarget , materialList[i] );
                 }
-                else if(rtType[i] == RTtype.MainShadow)
+                else if(mainCam && rtType[i] == RTtype.MainShadow)
                 {
                     cmd.SetGlobalTexture("_MainLightShadowmapTexture",m_RTList[i]);
                 }
-                else if(rtType[i] == RTtype.AddShadow)
+                else if(mainCam && rtType[i] == RTtype.AddShadow)
                 {
                     cmd.SetGlobalTexture("_AdditionalLightsShadowmapTexture",m_RTList[i]);
                 }

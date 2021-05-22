@@ -51,6 +51,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 9e06ef8a4e695344aacc6c9ef8dc6929, type: 2}
   - {fileID: 2100000, guid: 55e3ce9d2c0c3ed47b9b728ff6d405c3, type: 2}
   rtType: 00000000010000000200000003000000040000000500000006000000
+  mainCam: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -121,24 +121,56 @@ public class CollectGBuffer : ScriptableRendererFeature
 
             for(int i=0; i<materialList.Length; i++)
             {
-                cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                if(mainCam)
+                {
+                    if(rtType[i] == RTtype.Depth)
+                    {
+                        //cmd.Blit(  m_RTList[i] , renderingData.cameraData.renderer.cameraDepthTarget , materialList[i]);
+                        //cmd.SetGlobalTexture("_CameraDepthTexture", renderingData.cameraData.renderer.cameraDepthTarget);
 
-                if(mainCam && rtType[i] == RTtype.Depth)
-                {
-                    cmd.SetGlobalTexture("_CameraDepthTexture", m_RTList[i]);
-                    cmd.Blit( m_RTList[i] , renderingData.cameraData.renderer.cameraDepthTarget , materialList[i] );
-                }
-                else if(mainCam && rtType[i] == RTtype.MainShadow)
-                {
-                    cmd.SetGlobalTexture("_MainLightShadowmapTexture",m_RTList[i]);
-                }
-                else if(mainCam && rtType[i] == RTtype.AddShadow)
-                {
-                    cmd.SetGlobalTexture("_AdditionalLightsShadowmapTexture",m_RTList[i]);
+                        cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                        cmd.SetGlobalTexture("_CameraDepthTexture", m_RTList[i]);
+                        cmd.Blit( m_RTList[i] , renderingData.cameraData.renderer.cameraDepthTarget , materialList[i] );
+                    }
+                    else if(rtType[i] == RTtype.MainShadow)
+                    {
+                        cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                        cmd.SetGlobalTexture("_MainLightShadowmapTexture",m_RTList[i]);
+                    }
+                    else if(rtType[i] == RTtype.AddShadow)
+                    {
+                        cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                        cmd.SetGlobalTexture("_AdditionalLightsShadowmapTexture",m_RTList[i]);
+                    }
+                    else
+                    {
+                        cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
+                        cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                    }
                 }
                 else
                 {
+                    cmd.Blit( renderingData.cameraData.renderer.cameraColorTarget , m_RTList[i] , materialList[i]);
                     cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+
+                    // if(rtType[i] == RTtype.Depth)
+                    // {
+                    //     cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                    // }
+                    // else if(rtType[i] == RTtype.MainShadow)
+                    // {
+                    //     cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                    // }
+                    // else if(rtType[i] == RTtype.AddShadow)
+                    // {
+                    //     cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                    // }
+                    // else
+                    // {
+                    //     cmd.SetGlobalTexture(m_RTnameList[i],m_RTList[i]);
+                    // }
+
+                    //cmd.SetRenderTarget(renderingData.cameraData.renderer.cameraColorTarget);
                 }
             }
 

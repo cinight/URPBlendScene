@@ -6,45 +6,63 @@ Shader "Custom/CollectRT_Depth"
     }
     SubShader
     {
-        Cull Off ZWrite Off ZTest Always
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline"}
 
         Pass
         {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            Name "CopyDepth"
+            ZTest Always ZWrite On ColorMask 0
+            Cull Off
 
-            #include "UnityCG.cginc"
+            HLSLPROGRAM
+            #pragma vertex vert_Test
+            #pragma fragment frag_Test
 
-            struct appdata
+            #pragma multi_compile _ _DEPTH_MSAA_2 _DEPTH_MSAA_4 _DEPTH_MSAA_8
+            #pragma multi_compile _ _USE_DRAW_PROCEDURAL
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/CopyDepthPass.hlsl"
+            #include "Blending.hlsl"
+
+            #if MSAA_SAMPLES == 1
+                DEPTH_TEXTURE(_CameraDepthTexture);
+                SAMPLER(sampler_CameraDepthTexture);
+            #else
+                DEPTH_TEXTURE_MS(_CameraDepthTexture, MSAA_SAMPLES);
+                float4 _CameraDepthTexture_TexelSize;
+            #endif
+
+            Varyings vert_Test(Attributes input)
             {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
+                Varyings output;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                output.positionCS = TransformObjectToHClip(input.positionHCS.xyz);//float4(input.positionHCS.xyz, 1.0);
+                output.uv = input.uv;
+
+                return output;
+            }
+
+            struct fout
+            {
+                float4 color : SV_Target;
+                float depth : SV_Depth;
             };
 
-            struct v2f
+            fout frag_Test(Varyings input)
             {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
+                float col = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, input.uv);
+
+                fout o;
+                o.color = col;
+                o.depth = col;
                 return o;
             }
 
-            sampler2D _MainTex;
-            sampler2D _CameraDepthTexture;
-
-            float4 frag (v2f i) : SV_Target
-            {
-                float4 col = tex2D(_CameraDepthTexture, i.uv);
-                return col;
-            }
-            ENDCG
+            ENDHLSL
         }
     }
 }

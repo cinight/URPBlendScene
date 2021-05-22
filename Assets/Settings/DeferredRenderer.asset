@@ -78,8 +78,9 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 272046234206499128}
   - {fileID: -8477948485926642752}
+  - {fileID: 3982034394849955423}
   - {fileID: -1965729973643899537}
-  m_RendererFeatureMap: 38715cd09b80c603c01b4828c546588a6f0d9efc0053b8e4
+  m_RendererFeatureMap: 38715cd09b80c603c01b4828c546588a5f4e6b342f0743376f0d9efc0053b8e4
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -127,6 +128,27 @@ MonoBehaviour:
   material: {fileID: 0}
   isDepth: 0
   clearFlag: 2147483647
+  clearColor: {r: 0, g: 0, b: 0, a: 0}
+  clearDepth: 0
+  clearStencil: 0
+--- !u!114 &3982034394849955423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f27066a859911247b8d92ef8f8b2b16, type: 3}
+  m_Name: NewBlitToRT
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  evt: 210
+  RTname: _CameraDepthTexture
+  material: {fileID: 2100000, guid: 90097ff4f5072464abcd05b7185728b0, type: 2}
+  isDepth: 1
+  clearFlag: 0
   clearColor: {r: 0, g: 0, b: 0, a: 0}
   clearDepth: 0
   clearStencil: 0

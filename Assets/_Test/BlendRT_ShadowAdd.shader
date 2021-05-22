@@ -51,14 +51,26 @@ Shader "Custom/BlendRT_ShadowAdd"
                 return output;
             }
 
-            float frag_Test(Varyings input) : SV_Depth
+            struct fout
+            {
+                float4 color : SV_Target;
+                float depth : SV_Depth;
+            };
+
+
+            fout frag_Test(Varyings input)
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
                 float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_ShadowAddTexture, sampler_Cam1_ShadowAddTexture, input.uv);
                 float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_ShadowAddTexture, sampler_Cam2_ShadowAddTexture, input.uv);
 
-                return Blending(col1,col2,_Blend).r;
+                float col = Blending(col1,col2,_Blend).r;
+
+                fout o;
+                o.color = col;
+                o.depth = col;
+                return o;
             }
 
             ENDHLSL

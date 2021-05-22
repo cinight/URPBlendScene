@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2406309384319295041
+--- !u!114 &-7690565924639146620
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,35 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d91ecb4bd00b12419cc2a373bd06df6, type: 3}
-  m_Name: CollectGBufferCam1
+  m_Name: NewCollectRT
   m_EditorClassIdentifier: 
   m_Active: 1
-  nameList:
-  - Cam1_GBuffer0
-  - Cam1_GBuffer1
-  - Cam1_GBuffer2
-  - Cam1_GBuffer3
-  - Cam1_CameraDepthTexture
-  - Cam1_ShadowTexture
-  - Cam1_ShadowAddTexture
-  materialList:
-  - {fileID: 2100000, guid: f0e8c8e4d2766f1489889b50fa70b428, type: 2}
-  - {fileID: 2100000, guid: f7ade5b554884e349baab25d30a9687c, type: 2}
-  - {fileID: 2100000, guid: 34a0f1ea451ff064b871756f575db5a6, type: 2}
-  - {fileID: 2100000, guid: b52d9faf2c1a7f444ab8d1ba4d8e9224, type: 2}
-  - {fileID: 2100000, guid: be7884ecaa66e394abc5a23938ed9015, type: 2}
-  - {fileID: 2100000, guid: 8bd89489efcd03745ba1dcffe166aed2, type: 2}
-  - {fileID: 2100000, guid: b2c8ebd908d2e954ba973d4c3ead72c8, type: 2}
-  rtType: 00000000010000000200000003000000040000000500000006000000
-  rtSize:
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
-  - {x: 2048, y: 1024}
-  - {x: 2048, y: 1024}
-  mainCam: 0
+  cam1: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,8 +30,8 @@ MonoBehaviour:
     NumberFont: {fileID: 2800000, guid: f06a37246bbff114da01277637ca397e, type: 3}
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
-  - {fileID: -2406309384319295041}
-  m_RendererFeatureMap: bfa1f5375d129bde
+  - {fileID: -7690565924639146620}
+  m_RendererFeatureMap: 84fd28b4099f4595
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}

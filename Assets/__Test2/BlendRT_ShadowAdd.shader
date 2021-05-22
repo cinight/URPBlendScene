@@ -1,8 +1,7 @@
-Shader "Custom/BlendRT_Depth"
+Shader "Custom/BlendRT_ShadowAdd"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _Blend ("Blend", Range(0,1)) = 0.5
     }
     SubShader
@@ -26,15 +25,15 @@ Shader "Custom/BlendRT_Depth"
             #include "Blending.hlsl"
 
             #if MSAA_SAMPLES == 1
-                DEPTH_TEXTURE(Cam1_CameraDepthTexture);
-                SAMPLER(sampler_Cam1_CameraDepthTexture);
-                DEPTH_TEXTURE(Cam2_CameraDepthTexture);
-                SAMPLER(sampler_Cam2_CameraDepthTexture);
+                DEPTH_TEXTURE(Cam1_ShadowAddTexture);
+                SAMPLER(sampler_Cam1_ShadowAddTexture);
+                DEPTH_TEXTURE(Cam2_ShadowAddTexture);
+                SAMPLER(sampler_Cam2_ShadowAddTexture);
             #else
-                DEPTH_TEXTURE_MS(Cam1_CameraDepthTexture, MSAA_SAMPLES);
-                float4 Cam1_CameraDepthTexture_TexelSize;
-                DEPTH_TEXTURE_MS(Cam2_CameraDepthTexture, MSAA_SAMPLES);
-                float4 Cam2_CameraDepthTexture_TexelSize;
+                DEPTH_TEXTURE_MS(Cam1_ShadowAddTexture, MSAA_SAMPLES);
+                float4 Cam1_ShadowAddTexture_TexelSize;
+                DEPTH_TEXTURE_MS(Cam2_ShadowAddTexture, MSAA_SAMPLES);
+                float4 Cam2_ShadowAddTexture_TexelSize;
             #endif
 
             float _Blend;
@@ -51,16 +50,25 @@ Shader "Custom/BlendRT_Depth"
                 return output;
             }
 
-            float frag_Test(Varyings input) : SV_Depth
+            struct fout
+            {
+                float4 color : SV_Target;
+                float depth : SV_Depth;
+            };
+
+            fout frag_Test(Varyings input)
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_CameraDepthTexture, sampler_Cam1_CameraDepthTexture, input.uv);
-                float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_CameraDepthTexture, sampler_Cam2_CameraDepthTexture, input.uv);
+                float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_ShadowAddTexture, sampler_Cam1_ShadowAddTexture, input.uv);
+                float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_ShadowAddTexture, sampler_Cam2_ShadowAddTexture, input.uv);
 
                 float col = Blending(col1,col2,_Blend).r;
 
-                return col;
+                fout o;
+                o.color = col;
+                o.depth = col;
+                return o;
             }
 
             ENDHLSL

@@ -1,8 +1,7 @@
-Shader "Custom/BlendRT_ShadowAdd"
+Shader "Custom/BlendRT_Shadow"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _Blend ("Blend", Range(0,1)) = 0.5
     }
     SubShader
@@ -26,15 +25,15 @@ Shader "Custom/BlendRT_ShadowAdd"
             #include "Blending.hlsl"
 
             #if MSAA_SAMPLES == 1
-                DEPTH_TEXTURE(Cam1_ShadowAddTexture);
-                SAMPLER(sampler_Cam1_ShadowAddTexture);
-                DEPTH_TEXTURE(Cam2_ShadowAddTexture);
-                SAMPLER(sampler_Cam2_ShadowAddTexture);
+                DEPTH_TEXTURE(Cam1_ShadowTexture);
+                SAMPLER(sampler_Cam1_ShadowTexture);
+                DEPTH_TEXTURE(Cam2_ShadowTexture);
+                SAMPLER(sampler_Cam2_ShadowTexture);
             #else
-                DEPTH_TEXTURE_MS(Cam1_ShadowAddTexture, MSAA_SAMPLES);
-                float4 Cam1_ShadowAddTexture_TexelSize;
-                DEPTH_TEXTURE_MS(Cam2_ShadowAddTexture, MSAA_SAMPLES);
-                float4 Cam2_ShadowAddTexture_TexelSize;
+                DEPTH_TEXTURE_MS(Cam1_ShadowTexture, MSAA_SAMPLES);
+                float4 Cam1_ShadowTexture_TexelSize;
+                DEPTH_TEXTURE_MS(Cam2_ShadowTexture, MSAA_SAMPLES);
+                float4 Cam2_ShadowTexture_TexelSize;
             #endif
 
             float _Blend;
@@ -57,13 +56,12 @@ Shader "Custom/BlendRT_ShadowAdd"
                 float depth : SV_Depth;
             };
 
-
             fout frag_Test(Varyings input)
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_ShadowAddTexture, sampler_Cam1_ShadowAddTexture, input.uv);
-                float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_ShadowAddTexture, sampler_Cam2_ShadowAddTexture, input.uv);
+                float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_ShadowTexture, sampler_Cam1_ShadowTexture, input.uv);
+                float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_ShadowTexture, sampler_Cam2_ShadowTexture, input.uv);
 
                 float col = Blending(col1,col2,_Blend).r;
 

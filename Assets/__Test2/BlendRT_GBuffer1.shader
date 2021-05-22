@@ -2,7 +2,7 @@ Shader "Custom/BlendRT_GBuffer1"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        //_MainTex ("Texture", 2D) = "white" {}
         _Blend ("Blend", Range(0,1)) = 0.5
     }
     SubShader
@@ -40,7 +40,7 @@ Shader "Custom/BlendRT_GBuffer1"
 
             float _Blend;
 
-            sampler2D _MainTex;
+            //sampler2D _MainTex;
             sampler2D Cam1_GBuffer1;
             sampler2D Cam2_GBuffer1;
 

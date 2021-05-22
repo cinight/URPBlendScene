@@ -43,13 +43,10 @@ public class CollectRT : ScriptableRendererFeature
             RTCollection.ConfigureRT(cmd,cameraTextureDescriptor);
         }
 
-        private void DoCollectRT( ScriptableRenderContext context, CommandBuffer cmd, RenderTargetIdentifier from, RenderTargetIdentifier to, int name, Material mat, bool isDepth = false)
+        private void DoCollectRT( ScriptableRenderContext context, CommandBuffer cmd, RenderTargetIdentifier from, RenderTexture to, string name, Material mat )
         {
-            //cmd.Clear();
-            //if(isDepth) cmd.Blit( from , to );
             cmd.Blit( from , to , mat );
             cmd.SetGlobalTexture( name , to );
-            //context.ExecuteCommandBuffer(cmd);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -60,23 +57,23 @@ public class CollectRT : ScriptableRendererFeature
 
             if(cam1)
             {
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer0 , RTCollection.cam1_GBuffer0Id , RTCollection.mat_Collect_GBuffer0 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer1 , RTCollection.cam1_GBuffer1Id , RTCollection.mat_Collect_GBuffer1 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer2 , RTCollection.cam1_GBuffer2Id , RTCollection.mat_Collect_GBuffer2 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer3 , RTCollection.cam1_GBuffer3Id , RTCollection.mat_Collect_GBuffer3 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_Depth , RTCollection.cam1_DepthId , RTCollection.mat_Collect_Depth , true );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_ShadowMain , RTCollection.cam1_ShadowMainId , RTCollection.mat_Collect_ShadowMain );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_ShadowAdd , RTCollection.cam1_ShadowAddId , RTCollection.mat_Collect_ShadowAdd );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer0.tex , RTCollection.cam1_GBuffer0.name , RTCollection.mat_Collect_GBuffer0 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer1.tex , RTCollection.cam1_GBuffer1.name , RTCollection.mat_Collect_GBuffer1 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer2.tex , RTCollection.cam1_GBuffer2.name , RTCollection.mat_Collect_GBuffer2 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_GBuffer3.tex , RTCollection.cam1_GBuffer3.name , RTCollection.mat_Collect_GBuffer3 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_Depth.tex , RTCollection.cam1_Depth.name , RTCollection.mat_Collect_Depth );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_ShadowMain.tex , RTCollection.cam1_ShadowMain.name , RTCollection.mat_Collect_ShadowMain );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam1_ShadowAdd.tex , RTCollection.cam1_ShadowAdd.name , RTCollection.mat_Collect_ShadowAdd );
             }
             else
             {
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer0 , RTCollection.cam2_GBuffer0Id , RTCollection.mat_Collect_GBuffer0 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer1 , RTCollection.cam2_GBuffer1Id , RTCollection.mat_Collect_GBuffer1 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer2 , RTCollection.cam2_GBuffer2Id , RTCollection.mat_Collect_GBuffer2 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer3 , RTCollection.cam2_GBuffer3Id , RTCollection.mat_Collect_GBuffer3 );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_Depth , RTCollection.cam2_DepthId , RTCollection.mat_Collect_Depth , true );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_ShadowMain , RTCollection.cam2_ShadowMainId , RTCollection.mat_Collect_ShadowMain );
-                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_ShadowAdd , RTCollection.cam2_ShadowAddId , RTCollection.mat_Collect_ShadowAdd );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer0.tex , RTCollection.cam2_GBuffer0.name , RTCollection.mat_Collect_GBuffer0 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer1.tex , RTCollection.cam2_GBuffer1.name , RTCollection.mat_Collect_GBuffer1 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer2.tex , RTCollection.cam2_GBuffer2.name , RTCollection.mat_Collect_GBuffer2 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_GBuffer3.tex , RTCollection.cam2_GBuffer3.name , RTCollection.mat_Collect_GBuffer3 );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_Depth.tex , RTCollection.cam2_Depth.name , RTCollection.mat_Collect_Depth );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_ShadowMain.tex , RTCollection.cam2_ShadowMain.name , RTCollection.mat_Collect_ShadowMain );
+                DoCollectRT(context, cmd, renderingData.cameraData.renderer.cameraColorTarget , RTCollection.cam2_ShadowAdd.tex , RTCollection.cam2_ShadowAdd.name , RTCollection.mat_Collect_ShadowAdd );
             }
 
             context.ExecuteCommandBuffer(cmd);

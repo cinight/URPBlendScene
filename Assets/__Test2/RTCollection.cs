@@ -8,53 +8,29 @@ public class RTCollection
 {
     public static bool initialized = false;
 
-    public static int cam1_GBuffer0Id = Shader.PropertyToID("Cam1_GBuffer0");
-    public static int cam1_GBuffer1Id = Shader.PropertyToID("Cam1_GBuffer1");
-    public static int cam1_GBuffer2Id = Shader.PropertyToID("Cam1_GBuffer2");
-    public static int cam1_GBuffer3Id = Shader.PropertyToID("Cam1_GBuffer3");
-    public static int cam1_DepthId = Shader.PropertyToID("Cam1_CameraDepthTexture");
-    public static int cam1_ShadowMainId = Shader.PropertyToID("Cam1_ShadowTexture");
-    public static int cam1_ShadowAddId = Shader.PropertyToID("Cam1_ShadowAddTexture");
+    public static RTSet cam1_GBuffer0;
+    public static RTSet cam1_GBuffer1;
+    public static RTSet cam1_GBuffer2;
+    public static RTSet cam1_GBuffer3;
+    public static RTSet cam1_Depth;
+    public static RTSet cam1_ShadowMain;
+    public static RTSet cam1_ShadowAdd;
 
-    public static int cam2_GBuffer0Id = Shader.PropertyToID("Cam2_GBuffer0");
-    public static int cam2_GBuffer1Id = Shader.PropertyToID("Cam2_GBuffer1");
-    public static int cam2_GBuffer2Id = Shader.PropertyToID("Cam2_GBuffer2");
-    public static int cam2_GBuffer3Id = Shader.PropertyToID("Cam2_GBuffer3");
-    public static int cam2_DepthId = Shader.PropertyToID("Cam2_CameraDepthTexture");
-    public static int cam2_ShadowMainId = Shader.PropertyToID("Cam2_ShadowTexture");
-    public static int cam2_ShadowAddId = Shader.PropertyToID("Cam2_ShadowAddTexture");
+    public static RTSet cam2_GBuffer0;
+    public static RTSet cam2_GBuffer1;
+    public static RTSet cam2_GBuffer2;
+    public static RTSet cam2_GBuffer3;
+    public static RTSet cam2_Depth;
+    public static RTSet cam2_ShadowMain;
+    public static RTSet cam2_ShadowAdd;
 
-    public static int Blended_GBuffer0Id = Shader.PropertyToID("Blended_GBuffer0");
-    public static int Blended_GBuffer1Id = Shader.PropertyToID("Blended_GBuffer1");
-    public static int Blended_GBuffer2Id = Shader.PropertyToID("Blended_GBuffer2");
-    public static int Blended_GBuffer3Id = Shader.PropertyToID("Blended_GBuffer3");
-    public static int Blended_DepthId = Shader.PropertyToID("Blended_CameraDepthTexture");
-    public static int Blended_ShadowMainId = Shader.PropertyToID("Blended_ShadowTexture");
-    public static int Blended_ShadowAddId = Shader.PropertyToID("Blended_ShadowAddTexture");
-
-    public static RenderTargetIdentifier cam1_GBuffer0 = new RenderTargetIdentifier(cam1_GBuffer0Id);
-    public static RenderTargetIdentifier cam1_GBuffer1 = new RenderTargetIdentifier(cam1_GBuffer1Id);
-    public static RenderTargetIdentifier cam1_GBuffer2 = new RenderTargetIdentifier(cam1_GBuffer2Id);
-    public static RenderTargetIdentifier cam1_GBuffer3 = new RenderTargetIdentifier(cam1_GBuffer3Id);
-    public static RenderTargetIdentifier cam1_Depth = new RenderTargetIdentifier(cam1_DepthId);
-    public static RenderTargetIdentifier cam1_ShadowMain = new RenderTargetIdentifier(cam1_ShadowMainId);
-    public static RenderTargetIdentifier cam1_ShadowAdd = new RenderTargetIdentifier(cam1_ShadowAddId);
-
-    public static RenderTargetIdentifier cam2_GBuffer0 = new RenderTargetIdentifier(cam2_GBuffer0Id);
-    public static RenderTargetIdentifier cam2_GBuffer1 = new RenderTargetIdentifier(cam2_GBuffer1Id);
-    public static RenderTargetIdentifier cam2_GBuffer2 = new RenderTargetIdentifier(cam2_GBuffer2Id);
-    public static RenderTargetIdentifier cam2_GBuffer3 = new RenderTargetIdentifier(cam2_GBuffer3Id);
-    public static RenderTargetIdentifier cam2_Depth = new RenderTargetIdentifier(cam2_DepthId);
-    public static RenderTargetIdentifier cam2_ShadowMain = new RenderTargetIdentifier(cam2_ShadowMainId);
-    public static RenderTargetIdentifier cam2_ShadowAdd = new RenderTargetIdentifier(cam2_ShadowAddId);
-
-    public static RenderTargetIdentifier Blended_GBuffer0 = new RenderTargetIdentifier(Blended_GBuffer0Id);
-    public static RenderTargetIdentifier Blended_GBuffer1 = new RenderTargetIdentifier(Blended_GBuffer1Id);
-    public static RenderTargetIdentifier Blended_GBuffer2 = new RenderTargetIdentifier(Blended_GBuffer2Id);
-    public static RenderTargetIdentifier Blended_GBuffer3 = new RenderTargetIdentifier(Blended_GBuffer3Id);
-    public static RenderTargetIdentifier Blended_Depth = new RenderTargetIdentifier(Blended_DepthId);
-    public static RenderTargetIdentifier Blended_ShadowMain = new RenderTargetIdentifier(Blended_ShadowMainId);
-    public static RenderTargetIdentifier Blended_ShadowAdd = new RenderTargetIdentifier(Blended_ShadowAddId);
+    public static RTSet Blended_GBuffer0;
+    public static RTSet Blended_GBuffer1;
+    public static RTSet Blended_GBuffer2;
+    public static RTSet Blended_GBuffer3;
+    public static RTSet Blended_Depth;
+    public static RTSet Blended_ShadowMain;
+    public static RTSet Blended_ShadowAdd;
 
     public static Material mat_Collect_GBuffer0;
     public static Material mat_Collect_GBuffer1;
@@ -81,44 +57,44 @@ public class RTCollection
 
             //GBuffer0
             descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_SRGB;
-            cmd.GetTemporaryRT(cam1_GBuffer0Id, descriptor);
-            cmd.GetTemporaryRT(cam2_GBuffer0Id, descriptor);
-            cmd.GetTemporaryRT(Blended_GBuffer0Id, descriptor);
+            cam1_GBuffer0 = new RTSet( "Cam1_GBuffer0" , descriptor);
+            cam2_GBuffer0 = new RTSet( "Cam2_GBuffer0" , descriptor);
+            Blended_GBuffer0 = new RTSet( "Blended_GBuffer0" , descriptor);
 
             //GBuffer1
             descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm;
-            cmd.GetTemporaryRT(cam1_GBuffer1Id, descriptor);
-            cmd.GetTemporaryRT(cam2_GBuffer1Id, descriptor);
-            cmd.GetTemporaryRT(Blended_GBuffer1Id, descriptor);
+            cam1_GBuffer1 = new RTSet( "Cam1_GBuffer1" , descriptor);
+            cam2_GBuffer1 = new RTSet( "Cam2_GBuffer1" , descriptor);
+            Blended_GBuffer1 = new RTSet( "Blended_GBuffer1" , descriptor);
 
             //GBuffer2
             descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_SNorm;
-            cmd.GetTemporaryRT(cam1_GBuffer2Id, descriptor);
-            cmd.GetTemporaryRT(cam2_GBuffer2Id, descriptor);
-            cmd.GetTemporaryRT(Blended_GBuffer2Id, descriptor);
+            cam1_GBuffer2 = new RTSet( "Cam1_GBuffer2" , descriptor);
+            cam2_GBuffer2 = new RTSet( "Cam2_GBuffer2" , descriptor);
+            Blended_GBuffer2 = new RTSet( "Blended_GBuffer2" , descriptor);
 
             //GBuffer3
             descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm;
-            cmd.GetTemporaryRT(cam1_GBuffer3Id, descriptor);
-            cmd.GetTemporaryRT(cam2_GBuffer3Id, descriptor);
-            cmd.GetTemporaryRT(Blended_GBuffer3Id, descriptor);
+            cam1_GBuffer3 = new RTSet( "Cam1_GBuffer3" , descriptor);
+            cam2_GBuffer3 = new RTSet( "Cam2_GBuffer3" , descriptor);
+            Blended_GBuffer3 = new RTSet( "Blended_GBuffer3" , descriptor);
 
             //Depth
             descriptor.graphicsFormat = GraphicsFormat.DepthAuto;
-            cmd.GetTemporaryRT(cam1_DepthId, descriptor);
-            cmd.GetTemporaryRT(cam2_DepthId, descriptor);
-            cmd.GetTemporaryRT(Blended_DepthId, descriptor);
+            cam1_Depth = new RTSet( "Cam1_CameraDepthTexture" , descriptor);
+            cam2_Depth = new RTSet( "Cam2_CameraDepthTexture" , descriptor);
+            Blended_Depth = new RTSet( "Blended_CameraDepthTexture" , descriptor);
 
             //Shadow
             descriptor.graphicsFormat = GraphicsFormat.ShadowAuto;
             descriptor.width = 2048;
             descriptor.height = 1024;
-            cmd.GetTemporaryRT(cam1_ShadowMainId, descriptor);
-            cmd.GetTemporaryRT(cam1_ShadowAddId, descriptor);
-            cmd.GetTemporaryRT(cam2_ShadowMainId, descriptor);
-            cmd.GetTemporaryRT(cam2_ShadowAddId, descriptor);
-            cmd.GetTemporaryRT(Blended_ShadowMainId, descriptor);
-            cmd.GetTemporaryRT(Blended_ShadowAddId, descriptor);
+            cam1_ShadowMain = new RTSet( "Cam1_ShadowTexture" , descriptor);
+            cam1_ShadowAdd = new RTSet( "Cam1_ShadowAddTexture" , descriptor);
+            cam2_ShadowMain = new RTSet( "Cam2_ShadowTexture" , descriptor);
+            cam2_ShadowAdd = new RTSet( "Cam2_ShadowAddTexture" , descriptor);
+            Blended_ShadowMain = new RTSet( "Blended_ShadowTexture" , descriptor);
+            Blended_ShadowAdd = new RTSet( "Blended_ShadowAddTexture" , descriptor);
 
             //Register cleanup
             RenderPipelineManager.endFrameRendering += CleanUpRT;
@@ -156,38 +132,53 @@ public class RTCollection
 
     public static void CleanUpRT (ScriptableRenderContext context, Camera[] cameras)
     {
-        CommandBuffer cmd = CommandBufferPool.Get("CleanUp Temp RTs");
+        cam1_GBuffer0.Cleanup();
+        cam1_GBuffer1.Cleanup();
+        cam1_GBuffer2.Cleanup();
+        cam1_GBuffer3.Cleanup();
+        cam1_Depth.Cleanup();
+        cam1_ShadowMain.Cleanup();
+        cam1_ShadowAdd.Cleanup();
 
-        cmd.ReleaseTemporaryRT(cam1_GBuffer0Id);
-        cmd.ReleaseTemporaryRT(cam1_GBuffer1Id);
-        cmd.ReleaseTemporaryRT(cam1_GBuffer2Id);
-        cmd.ReleaseTemporaryRT(cam1_GBuffer3Id);
-        cmd.ReleaseTemporaryRT(cam1_DepthId);
-        cmd.ReleaseTemporaryRT(cam1_ShadowMainId);
-        cmd.ReleaseTemporaryRT(cam1_ShadowAddId);
+        cam2_GBuffer0.Cleanup();
+        cam2_GBuffer1.Cleanup();
+        cam2_GBuffer2.Cleanup();
+        cam2_GBuffer3.Cleanup();
+        cam2_Depth.Cleanup();
+        cam2_ShadowMain.Cleanup();
+        cam2_ShadowAdd.Cleanup();
 
-        cmd.ReleaseTemporaryRT(cam2_GBuffer0Id);
-        cmd.ReleaseTemporaryRT(cam2_GBuffer1Id);
-        cmd.ReleaseTemporaryRT(cam2_GBuffer2Id);
-        cmd.ReleaseTemporaryRT(cam2_GBuffer3Id);
-        cmd.ReleaseTemporaryRT(cam2_DepthId);
-        cmd.ReleaseTemporaryRT(cam2_ShadowMainId);
-        cmd.ReleaseTemporaryRT(cam2_ShadowAddId);
-
-        cmd.ReleaseTemporaryRT(Blended_GBuffer0Id);
-        cmd.ReleaseTemporaryRT(Blended_GBuffer1Id);
-        cmd.ReleaseTemporaryRT(Blended_GBuffer2Id);
-        cmd.ReleaseTemporaryRT(Blended_GBuffer3Id);
-        cmd.ReleaseTemporaryRT(Blended_DepthId);
-        cmd.ReleaseTemporaryRT(Blended_ShadowMainId);
-        cmd.ReleaseTemporaryRT(Blended_ShadowAddId);
-
-        context.ExecuteCommandBuffer(cmd);
-        CommandBufferPool.Release(cmd);
+        Blended_GBuffer0.Cleanup();
+        Blended_GBuffer1.Cleanup();
+        Blended_GBuffer2.Cleanup();
+        Blended_GBuffer3.Cleanup();
+        Blended_Depth.Cleanup();
+        Blended_ShadowMain.Cleanup();
+        Blended_ShadowAdd.Cleanup();
 
         initialized = false;
         
         RenderPipelineManager.endFrameRendering -= CleanUpRT;
+    }
+}
+
+public class RTSet
+{
+    public string name;
+    public int nameId;
+    public RenderTexture tex;
+
+    public RTSet(string n, RenderTextureDescriptor desc)
+    {
+        name = n;
+        nameId = Shader.PropertyToID(name);
+        tex = RenderTexture.GetTemporary(desc);
+        tex.name = name;
+    }
+
+    public void Cleanup()
+    {
+        RenderTexture.ReleaseTemporary(tex);
     }
 }
 

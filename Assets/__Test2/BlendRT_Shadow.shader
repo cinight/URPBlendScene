@@ -18,23 +18,13 @@ Shader "Custom/BlendRT_Shadow"
             #pragma vertex vert_Test
             #pragma fragment frag_Test
 
-            #pragma multi_compile _ _DEPTH_MSAA_2 _DEPTH_MSAA_4 _DEPTH_MSAA_8
-            #pragma multi_compile _ _USE_DRAW_PROCEDURAL
-
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/CopyDepthPass.hlsl"
             #include "Blending.hlsl"
 
-            #if MSAA_SAMPLES == 1
-                DEPTH_TEXTURE(Cam1_ShadowTexture);
-                SAMPLER(sampler_Cam1_ShadowTexture);
-                DEPTH_TEXTURE(Cam2_ShadowTexture);
-                SAMPLER(sampler_Cam2_ShadowTexture);
-            #else
-                DEPTH_TEXTURE_MS(Cam1_ShadowTexture, MSAA_SAMPLES);
-                float4 Cam1_ShadowTexture_TexelSize;
-                DEPTH_TEXTURE_MS(Cam2_ShadowTexture, MSAA_SAMPLES);
-                float4 Cam2_ShadowTexture_TexelSize;
-            #endif
+            DEPTH_TEXTURE(Cam1_ShadowTexture);
+            SAMPLER(sampler_Cam1_ShadowTexture);
+            DEPTH_TEXTURE(Cam2_ShadowTexture);
+            SAMPLER(sampler_Cam2_ShadowTexture);
 
             float _Blend;
 
@@ -63,7 +53,7 @@ Shader "Custom/BlendRT_Shadow"
                 float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_ShadowTexture, sampler_Cam1_ShadowTexture, input.uv);
                 float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_ShadowTexture, sampler_Cam2_ShadowTexture, input.uv);
 
-                float col = Blending(col1,col2,_Blend).r;
+                float col = BlendingShadow(col1,col2,_Blend,input.uv).r;
 
                 fout o;
                 o.color = col;

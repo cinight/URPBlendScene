@@ -49,7 +49,7 @@ Shader "Custom/BlendRT_GBuffer3"
                 float4 col1 = tex2D(Cam1_GBuffer3, i.uv);
                 float4 col2 = tex2D(Cam2_GBuffer3, i.uv);
 
-                float4 col = Blending(col1,col2,_Blend);
+                float4 col = BlendingGBuffer3(col1,col2,_Blend,i.uv);
                 return col;
             }
             ENDCG

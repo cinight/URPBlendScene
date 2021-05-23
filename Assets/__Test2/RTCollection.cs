@@ -74,7 +74,7 @@ public class RTCollection
             Blended_GBuffer2 = new RTSet( "Blended_GBuffer2" , descriptor);
 
             //GBuffer3
-            descriptor.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm;
+            descriptor.graphicsFormat = GraphicsFormat.B10G11R11_UFloatPack32;
             cam1_GBuffer3 = new RTSet( "Cam1_GBuffer3" , descriptor);
             cam2_GBuffer3 = new RTSet( "Cam2_GBuffer3" , descriptor);
             Blended_GBuffer3 = new RTSet( "Blended_GBuffer3" , descriptor);

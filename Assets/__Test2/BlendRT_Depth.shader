@@ -18,23 +18,13 @@ Shader "Custom/BlendRT_Depth"
             #pragma vertex vert_Test
             #pragma fragment frag_Test
 
-            #pragma multi_compile _ _DEPTH_MSAA_2 _DEPTH_MSAA_4 _DEPTH_MSAA_8
-            #pragma multi_compile _ _USE_DRAW_PROCEDURAL
-
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/CopyDepthPass.hlsl"
             #include "Blending.hlsl"
 
-            #if MSAA_SAMPLES == 1
-                DEPTH_TEXTURE(Cam1_CameraDepthTexture);
-                SAMPLER(sampler_Cam1_CameraDepthTexture);
-                DEPTH_TEXTURE(Cam2_CameraDepthTexture);
-                SAMPLER(sampler_Cam2_CameraDepthTexture);
-            #else
-                DEPTH_TEXTURE_MS(Cam1_CameraDepthTexture, MSAA_SAMPLES);
-                float4 Cam1_CameraDepthTexture_TexelSize;
-                DEPTH_TEXTURE_MS(Cam2_CameraDepthTexture, MSAA_SAMPLES);
-                float4 Cam2_CameraDepthTexture_TexelSize;
-            #endif
+            DEPTH_TEXTURE(Cam1_CameraDepthTexture);
+            SAMPLER(sampler_Cam1_CameraDepthTexture);
+            DEPTH_TEXTURE(Cam2_CameraDepthTexture);
+            SAMPLER(sampler_Cam2_CameraDepthTexture);
 
             float _Blend;
 
@@ -63,7 +53,7 @@ Shader "Custom/BlendRT_Depth"
                 float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_CameraDepthTexture, sampler_Cam1_CameraDepthTexture, input.uv);
                 float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_CameraDepthTexture, sampler_Cam2_CameraDepthTexture, input.uv);
 
-                float col = Blending(col1,col2,_Blend).r;
+                float col = BlendingDepth(col1,col2,_Blend,input.uv).r;
 
                 fout o;
                 o.color = col;

@@ -1,9 +1,8 @@
-Shader "Custom/BlendRT_GBuffer2"
+Shader "Custom/Apply_GBuffer3"
 {
     Properties
     {
-        //_MainTex ("Texture", 2D) = "white" {}
-        _Blend ("Blend", Range(0,1)) = 0.5
+        _MainTex ("Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -16,7 +15,6 @@ Shader "Custom/BlendRT_GBuffer2"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
-            #include "Blending.hlsl"
 
             struct appdata
             {
@@ -38,19 +36,14 @@ Shader "Custom/BlendRT_GBuffer2"
                 return o;
             }
 
-            float _Blend;
-
-            //sampler2D _MainTex;
-            sampler2D Cam1_GBuffer2;
-            sampler2D Cam2_GBuffer2;
+            sampler2D _MainTex;
+            sampler2D Blended_GBuffer3;
 
             float4 frag (v2f i) : SV_Target
             {
-                float4 col1 = tex2D(Cam1_GBuffer2, i.uv);
-                float4 col2 = tex2D(Cam2_GBuffer2, i.uv);
-
-                float4 col = BlendingColor(col1,col2,_Blend,i.uv);
-                return col;
+                float4 tex = tex2D(_MainTex, i.uv);
+                float4 tex2 = tex2D(Blended_GBuffer3, i.uv);
+                return tex+tex2;
             }
             ENDCG
         }

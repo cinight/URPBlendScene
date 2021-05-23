@@ -37,11 +37,12 @@ Shader "Custom/CollectRT_GBuffer3"
             }
 
             sampler2D _MainTex;
-            sampler2D _GBuffer3;
+            //sampler2D _GBuffer3;
+            sampler2D _CameraColorTexture;
 
             float4 frag (v2f i) : SV_Target
             {
-                float4 col = tex2D(_GBuffer3, i.uv);
+                float4 col = tex2D(_CameraColorTexture, i.uv);
                 return col;
             }
             ENDCG

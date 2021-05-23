@@ -22,7 +22,6 @@ Shader "Custom/CollectRT_Depth"
             #pragma multi_compile _ _USE_DRAW_PROCEDURAL
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/CopyDepthPass.hlsl"
-            #include "Blending.hlsl"
 
             #if MSAA_SAMPLES == 1
                 DEPTH_TEXTURE(_CameraDepthTexture);

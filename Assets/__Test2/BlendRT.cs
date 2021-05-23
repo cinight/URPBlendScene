@@ -70,7 +70,7 @@ public class BlendRT : ScriptableRendererFeature
 
             cmd.Blit( renderingData.cameraData.renderer.cameraDepthTarget , RTCollection.Blended_GBuffer3.tex , RTCollection.mat_Blend_GBuffer3 );
             cmd.SetGlobalTexture( "_GBuffer3", RTCollection.Blended_GBuffer3.tex );
-            cmd.SetGlobalTexture( RTCollection.Blended_GBuffer3.nameId, RTCollection.Blended_GBuffer3.tex );
+            cmd.Blit( RTCollection.Blended_GBuffer3.tex, renderingData.cameraData.renderer.cameraColorTarget );
 
             context.ExecuteCommandBuffer(cmd);
 			CommandBufferPool.Release(cmd);

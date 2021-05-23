@@ -1,26 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8535098952091144044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f27066a859911247b8d92ef8f8b2b16, type: 3}
-  m_Name: ApplyEmission
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  evt: 220
-  RTname: 
-  material: {fileID: 2100000, guid: f830a986fb9d3544aadce824cd61213a, type: 2}
-  isDepth: 0
-  clearFlag: 0
-  clearColor: {r: 0, g: 0, b: 0, a: 0}
-  clearDepth: 0
-  clearStencil: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40,8 +19,7 @@ MonoBehaviour:
   - {fileID: 4999775869013259037}
   - {fileID: 1724807204556831618}
   - {fileID: 5668791282468791482}
-  - {fileID: -8535098952091144044}
-  m_RendererFeatureMap: 1df31ab5a9c5624582fba49d03bfef17ba246209a397ab4e9470cc55b93c8d89
+  m_RendererFeatureMap: 1df31ab5a9c5624582fba49d03bfef17ba246209a397ab4e
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}

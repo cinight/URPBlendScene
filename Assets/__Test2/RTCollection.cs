@@ -80,13 +80,13 @@ public class RTCollection
             Blended_GBuffer3 = new RTSet( "Blended_GBuffer3" , descriptor);
 
             //Depth
-            descriptor.graphicsFormat = GraphicsFormat.DepthAuto;
+            descriptor.graphicsFormat = GraphicsFormat.None;
             cam1_Depth = new RTSet( "Cam1_CameraDepthTexture" , descriptor);
             cam2_Depth = new RTSet( "Cam2_CameraDepthTexture" , descriptor);
             Blended_Depth = new RTSet( "Blended_CameraDepthTexture" , descriptor);
 
             //Shadow
-            descriptor.graphicsFormat = GraphicsFormat.ShadowAuto;
+            descriptor.graphicsFormat = GraphicsFormat.None;
             descriptor.width = 2048;
             descriptor.height = 1024;
             cam1_ShadowMain = new RTSet( "Cam1_ShadowTexture" , descriptor);

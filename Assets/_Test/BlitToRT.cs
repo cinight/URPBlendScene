@@ -74,7 +74,7 @@ public class BlitToRT : ScriptableRendererFeature
 			CommandBuffer cmd = CommandBufferPool.Get(camera.name + " - BlitToRTPass - " + RTname);
 
             RenderTargetIdentifier RT = renderingData.cameraData.renderer.cameraColorTargetHandle;
-            if(isDepth) RT = renderingData.cameraData.renderer.cameraColorTargetHandle;
+            if(isDepth) RT = renderingData.cameraData.renderer.cameraDepthTargetHandle;
 
             //Clearing Render Target
             cmd.SetRenderTarget(RT);

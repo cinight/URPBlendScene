@@ -81,12 +81,16 @@ public class RTCollection
 
             //Depth
             descriptor.graphicsFormat = GraphicsFormat.None;
+            descriptor.colorFormat = RenderTextureFormat.Depth;
+            //descriptor.graphicsFormat = SystemInfo.GetGraphicsFormat(DefaultFormat.DepthStencil);
             cam1_Depth = new RTSet( "Cam1_CameraDepthTexture" , descriptor);
             cam2_Depth = new RTSet( "Cam2_CameraDepthTexture" , descriptor);
             Blended_Depth = new RTSet( "Blended_CameraDepthTexture" , descriptor);
 
             //Shadow
             descriptor.graphicsFormat = GraphicsFormat.None;
+            descriptor.colorFormat = RenderTextureFormat.Shadowmap;
+            //descriptor.graphicsFormat = SystemInfo.GetGraphicsFormat(DefaultFormat.Shadow);
             descriptor.width = 2048;
             descriptor.height = 1024;
             cam1_ShadowMain = new RTSet( "Cam1_ShadowTexture" , descriptor);

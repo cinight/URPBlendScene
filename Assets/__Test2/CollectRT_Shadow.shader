@@ -37,9 +37,10 @@ Shader "Custom/CollectRT_Shadow"
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-                output.positionCS = TransformObjectToHClip(input.positionHCS.xyz);//float4(input.positionHCS.xyz, 1.0);
-                output.uv = input.uv;
-
+                //ref to Blit.hlsl
+                output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
+                output.texcoord = GetFullScreenTriangleTexCoord(input.vertexID);
+                
                 return output;
             }
 
@@ -53,7 +54,7 @@ Shader "Custom/CollectRT_Shadow"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                float col = SAMPLE_DEPTH_TEXTURE(_MainLightShadowmapTexture, sampler_MainLightShadowmapTexture, input.uv);
+                float col = SAMPLE_DEPTH_TEXTURE(_MainLightShadowmapTexture, sampler_MainLightShadowmapTexture, input.texcoord);
 
                 fout o;
                 o.color = col;

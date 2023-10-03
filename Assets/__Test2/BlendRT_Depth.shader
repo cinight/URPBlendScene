@@ -34,8 +34,9 @@ Shader "Custom/BlendRT_Depth"
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-                output.positionCS = TransformObjectToHClip(input.positionHCS.xyz);//float4(input.positionHCS.xyz, 1.0);
-                output.uv = input.uv;
+                //ref to Blit.hlsl
+                output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
+                output.texcoord = GetFullScreenTriangleTexCoord(input.vertexID);
 
                 return output;
             }
@@ -50,10 +51,10 @@ Shader "Custom/BlendRT_Depth"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_CameraDepthTexture, sampler_Cam1_CameraDepthTexture, input.uv);
-                float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_CameraDepthTexture, sampler_Cam2_CameraDepthTexture, input.uv);
+                float col1 = SAMPLE_DEPTH_TEXTURE(Cam1_CameraDepthTexture, sampler_Cam1_CameraDepthTexture, input.texcoord);
+                float col2 = SAMPLE_DEPTH_TEXTURE(Cam2_CameraDepthTexture, sampler_Cam2_CameraDepthTexture, input.texcoord);
 
-                float col = BlendingDepth(col1,col2,_Blend,input.uv).r;
+                float col = BlendingDepth(col1,col2,_Blend,input.texcoord).r;
 
                 fout o;
                 o.color = col;

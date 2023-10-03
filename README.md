@@ -1,6 +1,6 @@
 # URPBlendScene
 
-Unity 2022.1+
+Unity 2022.3+
 URP Deferred
 
 Collect GBuffer/Depth/Shadowmaps from 2 cameras and blend them, \

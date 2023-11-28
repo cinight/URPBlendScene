@@ -11,8 +11,10 @@ Material:
   m_Shader: {fileID: 4800000, guid: 9b044e89f6cb05945909f58adb89e67f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_ValidKeywords:
+  - _OUTPUT_DEPTH
+  m_InvalidKeywords:
+  - BLENDDEPTH
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -37,7 +39,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 0.193
+    - _Blend: 0.167
     - _Progress: 0.548
     m_Colors: []
   m_BuildTextureStacks: []

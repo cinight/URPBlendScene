@@ -30,8 +30,8 @@ MonoBehaviour:
   - {fileID: 5668791282468791482}
   m_RendererFeatureMap: 1df31ab5a9c5624582fba49d03bfef17ba246209a397ab4e
   m_UseNativeRenderPass: 0
-  postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
+  postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   shaders:
     blitPS: {fileID: 4800000, guid: c17132b1f77d20942aa75f8429c0f8bc, type: 3}
     copyDepthPS: {fileID: 4800000, guid: d6dae50ee9e1bfa4db75f19f99355220, type: 3}
@@ -79,7 +79,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f27066a859911247b8d92ef8f8b2b16, type: 3}
   m_Name: Clear Depth
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   evt: 220
   RTname: _CameraDepthTexture
   material: {fileID: 0}
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f27066a859911247b8d92ef8f8b2b16, type: 3}
   m_Name: Clear Color
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   evt: 220
   RTname: 
   material: {fileID: 0}
@@ -122,3 +122,4 @@ MonoBehaviour:
   m_Name: Blend RT
   m_EditorClassIdentifier: 
   m_Active: 1
+  material: {fileID: 2100000, guid: 8eaf0fdc612184540bc24513de4d0720, type: 2}

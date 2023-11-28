@@ -1,13 +1,13 @@
-using System;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.Rendering.Universal.Internal;
 
 [CreateAssetMenu]
 public class BlendRT : ScriptableRendererFeature
 {
+	public Material material;
+	
 	public BlendRT()
 	{
 	}
@@ -18,62 +18,111 @@ public class BlendRT : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+        if(material == null)
+            return;
+        
         var evt = RenderPassEvent.AfterRenderingGbuffer;
         
-        var pass = new BlendRTPass(evt);
+        var pass = new BlendRTPass(evt,material);
         renderer.EnqueuePass(pass);
+    }
+    
+    protected override void Dispose(bool disposing)
+    {
+        RTCollection.CleanUp();
     }
 
     //-------------------------------------------------------------------------
 
 	class BlendRTPass : ScriptableRenderPass
 	{
-        public BlendRTPass(RenderPassEvent evt)
+		private Material m_Material;
+        private string k_SrcName1 = "_Src1";
+        private string k_SrcName2 = "_Src2";
+        private static Vector4 scaleBias = new Vector4(1f, 1f, 0f, 0f);
+        private int m_ShadowMainId = -1;
+        private int m_ShadowAddId = -1;
+
+        public BlendRTPass(RenderPassEvent evt, Material mat)
         {
-            this.renderPassEvent = evt;
-        }
-
-        public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
-        {
-            RTCollection.ConfigureRT(cmd,cameraTextureDescriptor);
-        }
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            var camera = renderingData.cameraData.camera;
-
-			CommandBuffer cmd = CommandBufferPool.Get(camera.name + " - BlendRTPass");
-
-            //Blend Depth first
-            cmd.Blit( renderingData.cameraData.renderer.cameraColorTargetHandle , RTCollection.Blended_Depth.tex , RTCollection.mat_Blend_Depth );
-            cmd.SetGlobalTexture( RTCollection.Blended_Depth.nameId, RTCollection.Blended_Depth.tex );
-            cmd.SetGlobalTexture( "_CameraDepthTexture", RTCollection.Blended_Depth.tex );
-            cmd.Blit( RTCollection.Blended_Depth.tex , renderingData.cameraData.renderer.cameraDepthTargetHandle , RTCollection.mat_Blend_Depth );
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
-
-            cmd.Blit( renderingData.cameraData.renderer.cameraColorTargetHandle , RTCollection.Blended_ShadowMain.tex , RTCollection.mat_Blend_ShadowMain );
-            cmd.SetGlobalTexture("_MainLightShadowmapTexture", RTCollection.Blended_ShadowMain.tex );
-
-            cmd.Blit( renderingData.cameraData.renderer.cameraColorTargetHandle , RTCollection.Blended_ShadowAdd.tex , RTCollection.mat_Blend_ShadowAdd );
-            cmd.SetGlobalTexture("_AdditionalLightsShadowmapTexture", RTCollection.Blended_ShadowAdd.tex );
-
-            //Blend Colors
-            cmd.Blit( renderingData.cameraData.renderer.cameraDepthTargetHandle , RTCollection.Blended_GBuffer0.tex , RTCollection.mat_Blend_GBuffer0 );
-            cmd.SetGlobalTexture( "_GBuffer0", RTCollection.Blended_GBuffer0.tex );
+            renderPassEvent = evt;
+            m_Material = mat;
             
-            cmd.Blit( renderingData.cameraData.renderer.cameraDepthTargetHandle , RTCollection.Blended_GBuffer1.tex , RTCollection.mat_Blend_GBuffer1 );
-            cmd.SetGlobalTexture( "_GBuffer1", RTCollection.Blended_GBuffer1.tex );
+            m_ShadowMainId = Shader.PropertyToID("_MainLightShadowmapTexture");
+            m_ShadowAddId = Shader.PropertyToID("_AdditionalLightsShadowmapTexture");
+        }
+        
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            
+            //shouldn't blit from the backbuffer
+            if (resourceData.isActiveTargetBackBuffer)
+                return;
+            
+            //null check
+            if (m_Material == null)
+                return;
+            
+            //Setup builder
+            var desc = cameraData.cameraTargetDescriptor;
+            
+            //if (RTCollection.blended == null) RTCollection.blended = new CamBufferSet();
+            resourceData.gBuffer[0] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer0, ref RTCollection.cam2.GBuffer0, "BlendRT_GBuffer0");
+            resourceData.gBuffer[1] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer1, ref RTCollection.cam2.GBuffer1, "BlendRT_GBuffer1");
+            resourceData.gBuffer[2] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer2, ref RTCollection.cam2.GBuffer2, "BlendRT_GBuffer2");
+            resourceData.gBuffer[3] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer3, ref RTCollection.cam2.GBuffer3, "BlendRT_GBuffer3");
+            resourceData.gBuffer[4] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer4, ref RTCollection.cam2.GBuffer4, "BlendRT_GBuffer4");
+            resourceData.mainShadowsTexture = SetupBuilder(renderGraph, ref RTCollection.cam1.ShadowMain, ref RTCollection.cam2.ShadowMain, "BlendRT_ShadowMain",m_ShadowMainId);
+            resourceData.additionalShadowsTexture = SetupBuilder(renderGraph, ref RTCollection.cam1.ShadowAdd, ref RTCollection.cam2.ShadowAdd, "BlendRT_ShadowAdd",m_ShadowAddId);
+        }
 
-            cmd.Blit( renderingData.cameraData.renderer.cameraDepthTargetHandle , RTCollection.Blended_GBuffer2.tex , RTCollection.mat_Blend_GBuffer2 );
-            cmd.SetGlobalTexture( "_GBuffer2", RTCollection.Blended_GBuffer2.tex );
+        private class PassData
+        {
+            internal TextureHandle src1;
+            internal TextureHandle src2;
+            internal Material mat;
+        }
+        private TextureHandle SetupBuilder(RenderGraph rg, ref RTSet srcRT1, ref RTSet srcRT2, string passName, int urpTextureId = -1)
+        {
+            //Create RT
+            TextureHandle src1 = rg.ImportTexture(srcRT1.rt);
+            TextureHandle src2 = rg.ImportTexture(srcRT2.rt);
+            TextureHandle dest = UniversalRenderer.CreateRenderGraphTexture(rg, srcRT1.desc, passName, false);
+            
+            //To avoid error from material preview in the scene
+            if(!src1.IsValid() || !src2.IsValid() || !dest.IsValid())
+                return TextureHandle.nullHandle;
 
-            cmd.Blit( renderingData.cameraData.renderer.cameraDepthTargetHandle , RTCollection.Blended_GBuffer3.tex , RTCollection.mat_Blend_GBuffer3 );
-            cmd.SetGlobalTexture( "_GBuffer3", RTCollection.Blended_GBuffer3.tex );
-            cmd.Blit( RTCollection.Blended_GBuffer3.tex, renderingData.cameraData.renderer.cameraColorTargetHandle );
-
-            context.ExecuteCommandBuffer(cmd);
-			CommandBufferPool.Release(cmd);
-		}
+            //Builder
+            using (var builder = rg.AddRasterRenderPass<PassData>(passName, out var passData))
+            {
+                //setup pass data
+                passData.src1 = src1;
+                passData.src2 = src2;
+                passData.mat = m_Material;
+                
+                //setup builder
+                builder.UseTexture(passData.src1);
+                builder.UseTexture(passData.src2);
+                builder.SetRenderAttachment(dest,0);
+                builder.AllowPassCulling(false);
+                builder.AllowGlobalStateModification(true); //in order to set global texture before blit
+                //For shadow texture we override original resource with global texture
+                if(urpTextureId >= 0) builder.SetGlobalTextureAfterPass(dest,urpTextureId);
+                
+                //render function
+                builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+                {
+                    //data.mat.SetTexture(k_SrcName1, data.src1);
+                    //data.mat.SetTexture(k_SrcName2, data.src2);
+                    context.cmd.SetGlobalTexture(k_SrcName1, data.src1);
+                    context.cmd.SetGlobalTexture(k_SrcName2, data.src2);
+                    Blitter.BlitTexture(context.cmd, data.src1, scaleBias, data.mat, 0);
+                });
+            }
+            return dest;
+        }
 	}
 }

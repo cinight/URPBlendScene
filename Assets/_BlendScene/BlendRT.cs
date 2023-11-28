@@ -123,6 +123,13 @@ public class BlendRT : ScriptableRendererFeature
             return dest;
         }
         
+        private class ShadowPassData
+        {
+            internal TextureHandle src1;
+            internal TextureHandle src2;
+            internal Material mat;
+            internal RenderTextureDescriptor desc;
+        }
         private TextureHandle SetupBuilderShadow(RenderGraph rg, ref RTSet srcRT1, ref RTSet srcRT2, string passName, int urpTextureId)
         {
             //Create RT
@@ -138,17 +145,18 @@ public class BlendRT : ScriptableRendererFeature
             LocalKeyword copyToDepth = new LocalKeyword(m_Material.shader,"_OUTPUT_DEPTH");
 
             //Builder
-            using (var builder = rg.AddRasterRenderPass<PassData>(passName, out var passData))
+            using (var builder = rg.AddRasterRenderPass<ShadowPassData>(passName, out var passData))
             {
                 //setup pass data
                 passData.src1 = src1;
                 passData.src2 = src2;
                 passData.mat = m_Material;
+                passData.desc = srcRT1.desc;
                 
                 //setup builder
                 builder.UseTexture(passData.src1);
                 builder.UseTexture(passData.src2);
-                builder.SetRenderAttachmentDepth(dest,0);
+                builder.SetRenderAttachmentDepth(dest);
                 builder.AllowPassCulling(false);
                 builder.AllowGlobalStateModification(true); //in order to set global texture before blit
                 
@@ -156,9 +164,10 @@ public class BlendRT : ScriptableRendererFeature
                 builder.SetGlobalTextureAfterPass(dest,urpTextureId);
                 
                 //render function
-                builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+                builder.SetRenderFunc((ShadowPassData data, RasterGraphContext context) =>
                 {
                     //Set copy depth keywords
+                    context.cmd.SetViewport(new Rect(0, 0, data.desc.width, data.desc.height));
                     context.cmd.EnableKeyword(data.mat, copyToDepth);
                     
                     //can't do Material.SetTexture() as this is not executed with the CommandBuffer

@@ -13,25 +13,20 @@ public class RTCollection
     public static Vector4 scaleBias = new Vector4(1f, 1f, 0f, 0f);
 
     //Use in CollectRT pass
-    public static bool AllocateRT(ref RTSet rtset, RenderGraph rg, ref TextureHandle src, RenderTextureDescriptor desc, string name, bool forceNoDepth = false)
+    public static bool AllocateRT(ref RTSet rtset, RenderGraph rg, ref TextureHandle src, RenderTextureDescriptor desc, string name, bool forShadow)
     {
         var texDesc = rg.GetTextureDesc(src);
         //Debug.Log(name + " format=" + desc.graphicsFormat + " depthStencil=" + desc.depthStencilFormat + " " +desc.width + "x" + desc.height + " bit=" + desc.depthBufferBits+ " tex=" + texDesc.colorFormat + " "+ texDesc.width + "x" + texDesc.height + " bit=" + texDesc.depthBufferBits);
         if(texDesc.colorFormat != GraphicsFormat.None) desc.graphicsFormat = texDesc.colorFormat;
+        //if (forShadow) desc.depthStencilFormat = GraphicsFormat.D16_UNorm;
         if(texDesc.width > 0) desc.width = texDesc.width;
         if(texDesc.height > 0) desc.height = texDesc.height;
-        if(forceNoDepth || texDesc.depthBufferBits == DepthBits.None) desc.depthBufferBits = 0;
+        if(!forShadow || texDesc.depthBufferBits == DepthBits.None) desc.depthBufferBits = 0;
         rtset.desc = desc;
-        RenderingUtils.ReAllocateIfNeeded(ref rtset.rt, desc, FilterMode.Point, TextureWrapMode.Clamp, name: name);
+        RenderingUtils.ReAllocateIfNeeded(ref rtset.rt, desc, texDesc.filterMode, texDesc.wrapMode, isShadowMap: forShadow, name: name);
         
         // true if the RT is depth (shadow texture requires depth), need special handling in CollectRT pass
         return desc.depthBufferBits != 0;
-    }
-    
-    //Use in BlendRT pass
-    public static void AllocateRTWithDesc(ref RTSet rtset, RenderTextureDescriptor desc, string name)
-    {
-        RenderingUtils.ReAllocateIfNeeded(ref rtset.rt, desc, FilterMode.Point, TextureWrapMode.Clamp, name: name);
     }
     
     public static void CleanUp ()

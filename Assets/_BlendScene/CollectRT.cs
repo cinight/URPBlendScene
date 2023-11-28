@@ -91,7 +91,7 @@ public class CollectRT : ScriptableRendererFeature
         private bool SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName)
         {
             //Create RT
-            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName, true); //Material preview triggers depth so we need to force no depth
+            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName, false); //Material preview triggers depth so we need to force no depth
             TextureHandle dest = rg.ImportTexture(destRT.rt);
             
             //To avoid error from material preview in the scene
@@ -162,7 +162,7 @@ public class CollectRT : ScriptableRendererFeature
         private void SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName, UniversalResourceData resourceData, UniversalCameraData cameraData)
         {
             //Create RT
-            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName);
+            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName,true);
             TextureHandle dest = rg.ImportTexture(destRT.rt);
 
             //To avoid error from material preview in the scene

@@ -13,21 +13,18 @@ public class RTCollection
     public static Vector4 scaleBias = new Vector4(1f, 1f, 0f, 0f);
 
     //Use in CollectRT pass
-    public static bool AllocateRT(ref RTSet rtset, RenderGraph rg, ref TextureHandle src, RenderTextureDescriptor desc, string name, bool forDepth, bool forShadow)
+    public static void AllocateRT(ref RTSet rtset, RenderGraph rg, ref TextureHandle src, RenderTextureDescriptor desc, string name, bool forDepth, bool forShadow)
     {
         var texDesc = rg.GetTextureDesc(src);
         //Debug.Log(name + " format=" + desc.graphicsFormat + " depthStencil=" + desc.depthStencilFormat + " " +desc.width + "x" + desc.height + " bit=" + desc.depthBufferBits+ " tex=" + texDesc.colorFormat + " "+ texDesc.width + "x" + texDesc.height + " bit=" + texDesc.depthBufferBits);
         if(texDesc.colorFormat != GraphicsFormat.None) desc.graphicsFormat = texDesc.colorFormat;
-        //if (forShadow) desc.depthStencilFormat = GraphicsFormat.D16_UNorm;
+        if (forShadow) desc.depthStencilFormat = GraphicsFormat.D16_UNorm;
         bool forCamColor = name.Contains("GBuffer3"); //Material preview makes camera color a differet size
         if(!forCamColor && !forDepth && texDesc.width > 0) desc.width = texDesc.width;
         if(!forCamColor && !forDepth && texDesc.height > 0) desc.height = texDesc.height;
         if(!forDepth && (!forShadow || texDesc.depthBufferBits == DepthBits.None) ) desc.depthBufferBits = 0;
         rtset.desc = desc;
         RenderingUtils.ReAllocateIfNeeded(ref rtset.rt, desc, texDesc.filterMode, texDesc.wrapMode, isShadowMap: forShadow, name: name);
-        
-        // true if the RT is depth (shadow texture requires depth), need special handling in CollectRT pass
-        return desc.depthBufferBits != 0;
     }
     
     public static void CleanUp ()

@@ -48,6 +48,19 @@ Shader "Blending"
             Name "BlendRT_Depth"
             ZTest Always ZWrite On ColorMask R
             Cull Off
+            
+            //Only used for the depth texture
+            //Observe values from Cam1 or Cam2 GBuffer pass stencil settings on FrameDebugger
+            Stencil
+            {
+                Ref 32
+                ReadMask 0
+                WriteMask 96
+                Comp Always
+                Pass Replace
+                Fail Keep
+                ZFail Keep
+            }
 
             HLSLPROGRAM
             #pragma vertex Vert

@@ -10,12 +10,12 @@ public class CollectRT : ScriptableRendererFeature
 {
     public bool cam1 = true;
     public Shader copyDepthShader;
+    public Shader collectShadowShader;
     private CollectRTPass m_pass;
     
     //Have to be in seperate passes otherwise the blit source will conflict
     private CameraDepthToTexPass m_CollectDepthPass;
-    private CameraDepthToTexPass m_CollectShadowMainPass;
-    private CameraDepthToTexPass m_CollectShadowAddPass;
+    private CameraShadowToTexPass m_CollectShadowPass;
 
 	public CollectRT()
 	{
@@ -30,20 +30,17 @@ public class CollectRT : ScriptableRendererFeature
         var evt = RenderPassEvent.AfterRenderingGbuffer;
         
         m_pass = new CollectRTPass(evt,cam1);
-        m_CollectDepthPass = new CameraDepthToTexPass(cam1,0, evt, copyDepthShader, false, true,false);
-        m_CollectShadowMainPass = new CameraDepthToTexPass(cam1,1, evt, copyDepthShader, false, true,false);
-        m_CollectShadowAddPass = new CameraDepthToTexPass(cam1,2, evt, copyDepthShader, false, true,false);
+        m_CollectDepthPass = new CameraDepthToTexPass(cam1, evt, copyDepthShader, false, true,false);
+        m_CollectShadowPass = new CameraShadowToTexPass(evt, cam1, collectShadowShader);
         renderer.EnqueuePass(m_pass);
         renderer.EnqueuePass(m_CollectDepthPass);
-        renderer.EnqueuePass(m_CollectShadowMainPass);
-        renderer.EnqueuePass(m_CollectShadowAddPass);
+        renderer.EnqueuePass(m_CollectShadowPass);
     }
     
     protected override void Dispose(bool disposing)
     {
         m_CollectDepthPass?.Dispose();
-        m_CollectShadowMainPass?.Dispose();
-        m_CollectShadowAddPass?.Dispose();
+        m_CollectShadowPass?.Dispose();
     }
 
     //-------------------------------------------------------------------------
@@ -92,7 +89,7 @@ public class CollectRT : ScriptableRendererFeature
         {
             internal TextureHandle src;
         }
-        private bool SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName)
+        private void SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName)
         {
             //Create RT
             RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName, false,false); //Material preview triggers depth so we need to force no depth
@@ -100,7 +97,7 @@ public class CollectRT : ScriptableRendererFeature
             
             //To avoid error from material preview in the scene
             if(!src.IsValid() || !dest.IsValid())
-                return false;
+                return;
             
             //Builder
             using (var builder = rg.AddRasterRenderPass<CollectRTPassData>(passName, out var passData))
@@ -119,23 +116,22 @@ public class CollectRT : ScriptableRendererFeature
                     Blitter.BlitTexture(context.cmd, data.src, RTCollection.scaleBias, 0, false);
                 });
             }
-
-            return true;
         }
     }
     
     //-------------------------------------------------------------------------
     
-    class CameraDepthToTexPass :CopyDepthPass
+    //Cannot reuse CopyDepthPass as it will use the GameView viewport for the blit which doesn't fit for shadowmap's aspect ratio
+    class CameraShadowToTexPass : ScriptableRenderPass
     {
         private bool m_IsCam1;
-        private int m_WhichTexture;
-        public CameraDepthToTexPass(bool cam1, int whichTexture, RenderPassEvent evt, Shader copyDepthShader, bool shouldClear = false,
-            bool copyToDepth = false, bool copyResolvedDepth = false)
-            : base(evt, copyDepthShader, shouldClear, copyToDepth, copyResolvedDepth)
+        private Material m_Material;
+
+        public CameraShadowToTexPass(RenderPassEvent evt, bool cam1, Shader collectShadowShader)
         {
             m_IsCam1 = cam1;
-            m_WhichTexture = whichTexture;
+            renderPassEvent = evt;
+            m_Material = CoreUtils.CreateEngineMaterial(collectShadowShader);
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
@@ -153,26 +149,95 @@ public class CollectRT : ScriptableRendererFeature
             
             //Setup builder
             var desc = cameraData.cameraTargetDescriptor;
-            switch (m_WhichTexture)
+            SetupBuilder(renderGraph, desc, resourceData.mainShadowsTexture, ref camSet.ShadowMain, setName+ "_CollectRT_ShadowMain");
+            SetupBuilder(renderGraph, desc, resourceData.additionalShadowsTexture, ref camSet.ShadowAdd, setName+ "_CollectRT_ShadowAdd");
+        }
+
+        private class ShadowPassData
+        {
+            internal TextureHandle src;
+            internal Material mat;
+            //internal RenderTextureDescriptor desc;
+        }
+        private void SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName)
+        {
+            //Create RT
+            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName,false,true);
+            TextureHandle dest = rg.ImportTexture(destRT.rt);
+
+            //To avoid error from material preview in the scene
+            if (!src.IsValid() || !dest.IsValid())
+                return;
+
+            //Keywords
+            LocalKeyword copyToDepth = new LocalKeyword(m_Material.shader,"_OUTPUT_DEPTH");
+            
+            //Builder
+            using (var builder = rg.AddRasterRenderPass<ShadowPassData>(passName, out var passData))
             {
-                case 0:
-                    SetupBuilder(renderGraph, desc, resourceData.cameraDepth, ref camSet.Depth, setName+ "_CollectRT_Depth", resourceData, cameraData);
-                    break;
-                case 1:
-                    SetupBuilder(renderGraph, desc, resourceData.mainShadowsTexture, ref camSet.ShadowMain, setName+ "_CollectRT_ShadowMain", resourceData, cameraData);
-                    break;
-                case 2:
-                    SetupBuilder(renderGraph, desc, resourceData.additionalShadowsTexture, ref camSet.ShadowAdd, setName+ "_CollectRT_ShadowAdd", resourceData, cameraData);
-                    break;
+                //setup pass data
+                passData.src = src;
+                passData.mat = m_Material;
+                
+                //setup builder
+                builder.UseTexture(passData.src);
+                builder.SetRenderAttachmentDepth(dest);
+                builder.AllowPassCulling(false);
+                builder.AllowGlobalStateModification(true); //in order to set keyword
+                
+                //render function
+                builder.SetRenderFunc((ShadowPassData data, RasterGraphContext context) =>
+                {
+                    //Set copy depth keywords and viewport
+                    //context.cmd.SetViewport(new Rect(0, 0, data.desc.width, data.desc.height));
+                    context.cmd.EnableKeyword(data.mat, copyToDepth);
+                    
+                    //Blit
+                    Blitter.BlitTexture(context.cmd, data.src, RTCollection.scaleBias, data.mat, 0);
+                });
             }
+        }
+
+        public void Dispose()
+        {
+            if(m_Material!=null) CoreUtils.Destroy(m_Material);
+        }
+    }
+    
+    //-------------------------------------------------------------------------
+    
+    class CameraDepthToTexPass :CopyDepthPass
+    {
+        private bool m_IsCam1;
+        public CameraDepthToTexPass(bool cam1, RenderPassEvent evt, Shader copyDepthShader, bool shouldClear = false,
+            bool copyToDepth = false, bool copyResolvedDepth = false)
+            : base(evt, copyDepthShader, shouldClear, copyToDepth, copyResolvedDepth)
+        {
+            m_IsCam1 = cam1;
+        }
+
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            
+            //shouldn't blit from the backbuffer
+            if (resourceData.isActiveTargetBackBuffer)
+                return;
+            
+            //Setup RTset
+            string setName = m_IsCam1? "Cam1" : "Cam2";
+            CamBufferSet camSet = m_IsCam1 ? RTCollection.cam1 : RTCollection.cam2;
+            
+            //Setup builder
+            var desc = cameraData.cameraTargetDescriptor;
+            SetupBuilder(renderGraph, desc, resourceData.cameraDepth, ref camSet.Depth, setName+ "_CollectRT_Depth", resourceData, cameraData);
         }
 
         private void SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName, UniversalResourceData resourceData, UniversalCameraData cameraData)
         {
             //Create RT
-            bool isDepth = m_WhichTexture == 0;
-            bool isShadow = !isDepth;
-            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName,isDepth,isShadow);
+            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName,true,false);
             TextureHandle dest = rg.ImportTexture(destRT.rt);
 
             //To avoid error from material preview in the scene

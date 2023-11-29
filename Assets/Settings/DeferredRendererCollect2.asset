@@ -15,6 +15,7 @@ MonoBehaviour:
   m_Active: 1
   cam1: 0
   copyDepthShader: {fileID: 4800000, guid: d6dae50ee9e1bfa4db75f19f99355220, type: 3}
+  collectShadowShader: {fileID: 4800000, guid: 6857549e5e880ab4380793affca7c03d, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

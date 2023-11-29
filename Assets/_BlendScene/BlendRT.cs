@@ -171,7 +171,7 @@ public class BlendRT : ScriptableRendererFeature
                     context.cmd.SetViewport(new Rect(0, 0, data.desc.width, data.desc.height));
                     context.cmd.EnableKeyword(data.mat, copyToDepth);
                     
-                    //can't do Material.SetTexture() as this is not executed with the CommandBuffer
+                    //can't do Material.SetTexture() as it is not executed with the CommandBuffer
                     context.cmd.SetGlobalTexture(k_SrcName1, data.src1);
                     context.cmd.SetGlobalTexture(k_SrcName2, data.src2);
                     

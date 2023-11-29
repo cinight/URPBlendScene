@@ -13,15 +13,15 @@ public class RTCollection
     public static Vector4 scaleBias = new Vector4(1f, 1f, 0f, 0f);
 
     //Use in CollectRT pass
-    public static bool AllocateRT(ref RTSet rtset, RenderGraph rg, ref TextureHandle src, RenderTextureDescriptor desc, string name, bool forShadow)
+    public static bool AllocateRT(ref RTSet rtset, RenderGraph rg, ref TextureHandle src, RenderTextureDescriptor desc, string name, bool forDepth, bool forShadow)
     {
         var texDesc = rg.GetTextureDesc(src);
         //Debug.Log(name + " format=" + desc.graphicsFormat + " depthStencil=" + desc.depthStencilFormat + " " +desc.width + "x" + desc.height + " bit=" + desc.depthBufferBits+ " tex=" + texDesc.colorFormat + " "+ texDesc.width + "x" + texDesc.height + " bit=" + texDesc.depthBufferBits);
         if(texDesc.colorFormat != GraphicsFormat.None) desc.graphicsFormat = texDesc.colorFormat;
         //if (forShadow) desc.depthStencilFormat = GraphicsFormat.D16_UNorm;
-        if(texDesc.width > 0) desc.width = texDesc.width;
-        if(texDesc.height > 0) desc.height = texDesc.height;
-        if(!forShadow || texDesc.depthBufferBits == DepthBits.None) desc.depthBufferBits = 0;
+        if(!forDepth && texDesc.width > 0) desc.width = texDesc.width;
+        if(!forDepth && texDesc.height > 0) desc.height = texDesc.height;
+        if(!forDepth && (!forShadow || texDesc.depthBufferBits == DepthBits.None) ) desc.depthBufferBits = 0;
         rtset.desc = desc;
         RenderingUtils.ReAllocateIfNeeded(ref rtset.rt, desc, texDesc.filterMode, texDesc.wrapMode, isShadowMap: forShadow, name: name);
         
@@ -48,7 +48,8 @@ public class CamBufferSet
     public RTSet GBuffer1;
     public RTSet GBuffer2;
     public RTSet GBuffer3;
-    public RTSet GBuffer4; //Depth
+    public RTSet GBuffer4;
+    public RTSet Depth;
     public RTSet ShadowMain;
     public RTSet ShadowAdd;
 
@@ -64,6 +65,7 @@ public class CamBufferSet
         GBuffer2.rt?.Release();
         GBuffer3.rt?.Release();
         GBuffer4.rt?.Release();
+        Depth.rt?.Release();
         ShadowMain.rt?.Release();
         ShadowAdd.rt?.Release();
     }

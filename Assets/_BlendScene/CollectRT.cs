@@ -13,6 +13,7 @@ public class CollectRT : ScriptableRendererFeature
     private CollectRTPass m_pass;
     
     //Have to be in seperate passes otherwise the blit source will conflict
+    private CameraDepthToTexPass m_CollectDepthPass;
     private CameraDepthToTexPass m_CollectShadowMainPass;
     private CameraDepthToTexPass m_CollectShadowAddPass;
 
@@ -29,15 +30,18 @@ public class CollectRT : ScriptableRendererFeature
         var evt = RenderPassEvent.AfterRenderingGbuffer;
         
         m_pass = new CollectRTPass(evt,cam1);
-        m_CollectShadowMainPass = new CameraDepthToTexPass(cam1,true, evt, copyDepthShader, false, true,false);
-        m_CollectShadowAddPass = new CameraDepthToTexPass(cam1,false, evt, copyDepthShader, false, true,false);
+        m_CollectDepthPass = new CameraDepthToTexPass(cam1,0, evt, copyDepthShader, false, true,false);
+        m_CollectShadowMainPass = new CameraDepthToTexPass(cam1,1, evt, copyDepthShader, false, true,false);
+        m_CollectShadowAddPass = new CameraDepthToTexPass(cam1,2, evt, copyDepthShader, false, true,false);
         renderer.EnqueuePass(m_pass);
+        renderer.EnqueuePass(m_CollectDepthPass);
         renderer.EnqueuePass(m_CollectShadowMainPass);
         renderer.EnqueuePass(m_CollectShadowAddPass);
     }
     
     protected override void Dispose(bool disposing)
     {
+        m_CollectDepthPass?.Dispose();
         m_CollectShadowMainPass?.Dispose();
         m_CollectShadowAddPass?.Dispose();
     }
@@ -91,7 +95,7 @@ public class CollectRT : ScriptableRendererFeature
         private bool SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName)
         {
             //Create RT
-            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName, false); //Material preview triggers depth so we need to force no depth
+            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName, false,false); //Material preview triggers depth so we need to force no depth
             TextureHandle dest = rg.ImportTexture(destRT.rt);
             
             //To avoid error from material preview in the scene
@@ -125,13 +129,13 @@ public class CollectRT : ScriptableRendererFeature
     class CameraDepthToTexPass :CopyDepthPass
     {
         private bool m_IsCam1;
-        private bool m_IsShadowMain;
-        public CameraDepthToTexPass(bool cam1, bool shadowMain, RenderPassEvent evt, Shader copyDepthShader, bool shouldClear = false,
+        private int m_WhichTexture;
+        public CameraDepthToTexPass(bool cam1, int whichTexture, RenderPassEvent evt, Shader copyDepthShader, bool shouldClear = false,
             bool copyToDepth = false, bool copyResolvedDepth = false)
             : base(evt, copyDepthShader, shouldClear, copyToDepth, copyResolvedDepth)
         {
             m_IsCam1 = cam1;
-            m_IsShadowMain = shadowMain;
+            m_WhichTexture = whichTexture;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
@@ -149,20 +153,26 @@ public class CollectRT : ScriptableRendererFeature
             
             //Setup builder
             var desc = cameraData.cameraTargetDescriptor;
-            if (m_IsShadowMain)
+            switch (m_WhichTexture)
             {
-                SetupBuilder(renderGraph, desc, resourceData.mainShadowsTexture, ref camSet.ShadowMain, setName+ "_CollectRT_ShadowMain", resourceData, cameraData);
-            }
-            else
-            {
-                SetupBuilder(renderGraph, desc, resourceData.additionalShadowsTexture, ref camSet.ShadowAdd, setName+ "_CollectRT_ShadowAdd", resourceData, cameraData);
+                case 0:
+                    SetupBuilder(renderGraph, desc, resourceData.cameraDepth, ref camSet.Depth, setName+ "_CollectRT_Depth", resourceData, cameraData);
+                    break;
+                case 1:
+                    SetupBuilder(renderGraph, desc, resourceData.mainShadowsTexture, ref camSet.ShadowMain, setName+ "_CollectRT_ShadowMain", resourceData, cameraData);
+                    break;
+                case 2:
+                    SetupBuilder(renderGraph, desc, resourceData.additionalShadowsTexture, ref camSet.ShadowAdd, setName+ "_CollectRT_ShadowAdd", resourceData, cameraData);
+                    break;
             }
         }
 
         private void SetupBuilder(RenderGraph rg, RenderTextureDescriptor desc, TextureHandle src, ref RTSet destRT, string passName, UniversalResourceData resourceData, UniversalCameraData cameraData)
         {
             //Create RT
-            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName,true);
+            bool isDepth = m_WhichTexture == 0;
+            bool isShadow = !isDepth;
+            RTCollection.AllocateRT(ref destRT, rg, ref src, desc, passName,isDepth,isShadow);
             TextureHandle dest = rg.ImportTexture(destRT.rt);
 
             //To avoid error from material preview in the scene

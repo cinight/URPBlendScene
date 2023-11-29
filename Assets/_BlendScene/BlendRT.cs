@@ -73,6 +73,7 @@ public class BlendRT : ScriptableRendererFeature
             resourceData.gBuffer[2] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer2, ref RTCollection.cam2.GBuffer2, "BlendRT_GBuffer2");
             resourceData.gBuffer[3] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer3, ref RTCollection.cam2.GBuffer3, "BlendRT_GBuffer3");
             resourceData.gBuffer[4] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer4, ref RTCollection.cam2.GBuffer4, "BlendRT_GBuffer4");
+            resourceData.cameraDepth = SetupBuilderShadow(renderGraph, ref RTCollection.cam1.Depth, ref RTCollection.cam2.Depth, "BlendRT_Depth",-1);
             resourceData.mainShadowsTexture = SetupBuilderShadow(renderGraph, ref RTCollection.cam1.ShadowMain, ref RTCollection.cam2.ShadowMain, "BlendRT_ShadowMain",m_ShadowMainId);
             resourceData.additionalShadowsTexture = SetupBuilderShadow(renderGraph, ref RTCollection.cam1.ShadowAdd, ref RTCollection.cam2.ShadowAdd, "BlendRT_ShadowAdd",m_ShadowAddId);
         }
@@ -161,7 +162,7 @@ public class BlendRT : ScriptableRendererFeature
                 builder.AllowGlobalStateModification(true); //in order to set global texture before blit
                 
                 //For shadow texture we override original resource with global texture
-                builder.SetGlobalTextureAfterPass(dest,urpTextureId);
+                if(urpTextureId != -1) builder.SetGlobalTextureAfterPass(dest,urpTextureId);
                 
                 //render function
                 builder.SetRenderFunc((ShadowPassData data, RasterGraphContext context) =>

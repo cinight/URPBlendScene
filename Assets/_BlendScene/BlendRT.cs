@@ -71,7 +71,7 @@ public class BlendRT : ScriptableRendererFeature
             resourceData.gBuffer[0] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer0, ref RTCollection.cam2.GBuffer0, "BlendRT_GBuffer0");
             resourceData.gBuffer[1] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer1, ref RTCollection.cam2.GBuffer1, "BlendRT_GBuffer1");
             resourceData.gBuffer[2] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer2, ref RTCollection.cam2.GBuffer2, "BlendRT_GBuffer2");
-            resourceData.gBuffer[3] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer3, ref RTCollection.cam2.GBuffer3, "BlendRT_GBuffer3");
+            resourceData.cameraColor = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer3, ref RTCollection.cam2.GBuffer3, "BlendRT_GBuffer3");
             resourceData.gBuffer[4] = SetupBuilder(renderGraph, ref RTCollection.cam1.GBuffer4, ref RTCollection.cam2.GBuffer4, "BlendRT_GBuffer4");
             resourceData.cameraDepth = SetupBuilderShadow(renderGraph, ref RTCollection.cam1.Depth, ref RTCollection.cam2.Depth, "BlendRT_Depth",-1);
             resourceData.mainShadowsTexture = SetupBuilderShadow(renderGraph, ref RTCollection.cam1.ShadowMain, ref RTCollection.cam2.ShadowMain, "BlendRT_ShadowMain",m_ShadowMainId);

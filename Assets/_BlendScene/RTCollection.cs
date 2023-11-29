@@ -19,8 +19,9 @@ public class RTCollection
         //Debug.Log(name + " format=" + desc.graphicsFormat + " depthStencil=" + desc.depthStencilFormat + " " +desc.width + "x" + desc.height + " bit=" + desc.depthBufferBits+ " tex=" + texDesc.colorFormat + " "+ texDesc.width + "x" + texDesc.height + " bit=" + texDesc.depthBufferBits);
         if(texDesc.colorFormat != GraphicsFormat.None) desc.graphicsFormat = texDesc.colorFormat;
         //if (forShadow) desc.depthStencilFormat = GraphicsFormat.D16_UNorm;
-        if(!forDepth && texDesc.width > 0) desc.width = texDesc.width;
-        if(!forDepth && texDesc.height > 0) desc.height = texDesc.height;
+        bool forCamColor = name.Contains("GBuffer3"); //Material preview makes camera color a differet size
+        if(!forCamColor && !forDepth && texDesc.width > 0) desc.width = texDesc.width;
+        if(!forCamColor && !forDepth && texDesc.height > 0) desc.height = texDesc.height;
         if(!forDepth && (!forShadow || texDesc.depthBufferBits == DepthBits.None) ) desc.depthBufferBits = 0;
         rtset.desc = desc;
         RenderingUtils.ReAllocateIfNeeded(ref rtset.rt, desc, texDesc.filterMode, texDesc.wrapMode, isShadowMap: forShadow, name: name);
@@ -47,7 +48,7 @@ public class CamBufferSet
     public RTSet GBuffer0;
     public RTSet GBuffer1;
     public RTSet GBuffer2;
-    public RTSet GBuffer3;
+    public RTSet GBuffer3; //camera color
     public RTSet GBuffer4;
     public RTSet Depth;
     public RTSet ShadowMain;

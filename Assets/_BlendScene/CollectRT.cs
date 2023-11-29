@@ -84,7 +84,7 @@ public class CollectRT : ScriptableRendererFeature
             SetupBuilder(renderGraph, desc, resourceData.gBuffer[0], ref camSet.GBuffer0, setName+ "_CollectRT_GBuffer0");
             SetupBuilder(renderGraph, desc, resourceData.gBuffer[1], ref camSet.GBuffer1, setName+ "_CollectRT_GBuffer1");
             SetupBuilder(renderGraph, desc, resourceData.gBuffer[2], ref camSet.GBuffer2, setName+ "_CollectRT_GBuffer2");
-            SetupBuilder(renderGraph, desc, resourceData.gBuffer[3], ref camSet.GBuffer3, setName+ "_CollectRT_GBuffer3");
+            SetupBuilder(renderGraph, desc, resourceData.cameraColor, ref camSet.GBuffer3, setName+ "_CollectRT_GBuffer3");
             SetupBuilder(renderGraph, desc, resourceData.gBuffer[4], ref camSet.GBuffer4, setName+ "_CollectRT_GBuffer4");
         }
 
